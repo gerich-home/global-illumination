@@ -33,8 +33,8 @@ IEngine* engine;
 
 #define W 640
 #define H 640
-#define CAM_Z 6
-#define CAM_SIZE 0.5
+#define CAM_Z 0.0000001
+#define CAM_SIZE (0.55 * CAM_Z / (1 + CAM_Z))
 #define PIXEL_SIZE 1.05
 #define WORKERS 8
 //#define SEED 0
@@ -173,20 +173,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	
 	GO_FLOAT kd3[] = {0, 0, 0};
 	GO_FLOAT ks3[] = {1, 1, 1};
-	int      n3[]  = {1000, 1000, 1000};
-	const IMaterial* m3 = new Materials::IdealMirrorMaterial(ks3);
+	int      n3[]  = {10, 10, 10};
+	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
 	
-	GO_FLOAT Le1[] = {10, 10, 10};
+	GO_FLOAT Le1[] = {40, 40, 40};
 	
-	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1),  Vector(-0.5, -0.5, 10), Vector(0.5,  -0.5, 1),  m1);
-	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(0.5,   0.5, 1),  Vector(-0.5,  0.5, 10), m1);
-	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10),  Vector(0.5,  -0.5, 10), m3);
-	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(-0.5, 0.5, 10),  Vector(-0.5, -0.5, 1),  m1);
-	const IShape* rightWall = new Shapes::Square(Vector(0.5,  0.5, 1),   Vector(0.5, -0.5, 1),   Vector(0.5, 0.5, 10),   m1);
+	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), m1);
+	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m1);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m1);
+	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m1);
+	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m1);
 		
-	const IShape* ball1 = new Shapes::Sphere(Vector(0, -0.4, 8),    0.1,  m1);
-	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3, 0, 3),    0.15, m2);
-	const IShape* ball3 = new Shapes::Sphere(Vector(-0.3, -0.2, 4), 0.3,  m3);
+	const IShape* ball1 = new Shapes::Sphere(Vector(   0, -0.4, 1.3), 0.1,  m1);
+	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3,    0, 1.1), 0.15, m2);
+	const IShape* ball3 = new Shapes::Sphere(Vector(0.3, -0.2, 1.2), 0.3,  m3);
 
 	const IShape* shapes[] = {
 		floor,
@@ -197,7 +197,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 		ball1,
 		ball2,
-		//ball3,
+		ball3,
 	};
 	
 	const IShape* glossyShapes[] = {
@@ -225,8 +225,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	};
 	
 	const ILightSource* lightSources[] = {
-		new Lights::Square(Vector(-0.15, 0.45, 3.35), Vector(0.15,  0.45, 3.35), Vector(-0.15, 0.45, 3.65), Luminance(Le1)),
-	//	new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
+		new Lights::Square(Vector(-0.15, 0.45, 0.35), Vector(0.15,  0.45, 0.35), Vector(-0.15, 0.45, 0.65), Luminance(Le1)),
+		//new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
 		//new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
 		//new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
 	};
