@@ -197,8 +197,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	
 	srand(time(0));
 	
-	ZeroMemory(&frame, sizeof(frame));
-	ZeroMemory(&busy, sizeof(busy));
+	ZeroMemory(frame, sizeof(frame));
+	ZeroMemory(busy, sizeof(busy));
+	ZeroMemory(L, sizeof(L));
 
 	InitializeCriticalSection(&CriticalSection);
 
