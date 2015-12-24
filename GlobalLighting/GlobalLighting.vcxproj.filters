@@ -46,6 +46,9 @@
     <Filter Include="Файлы исходного кода\Engine">
       <UniqueIdentifier>{73aee6d0-7742-440a-8d39-8bb8d30efdae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы исходного кода\PhotonMapBuilders">
+      <UniqueIdentifier>{cf98bda4-5342-467e-bef7-4c4045cf87c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -220,6 +223,12 @@
     </ClCompile>
     <ClCompile Include="PhotonMap.cpp">
       <Filter>Файлы исходного кода\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalPhotonMapBuilder.cpp">
+      <Filter>Файлы исходного кода\PhotonMapBuilders</Filter>
+    </ClCompile>
+    <ClCompile Include="CausticPhotonMapBuilder.cpp">
+      <Filter>Файлы исходного кода\PhotonMapBuilders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

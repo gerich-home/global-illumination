@@ -118,8 +118,10 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CausticPhotonMapBuilder.cpp" />
     <ClCompile Include="ComposeLightSource.cpp" />
     <ClCompile Include="GlobalLighting.cpp" />
+    <ClCompile Include="GlobalPhotonMapBuilder.cpp" />
     <ClCompile Include="PhotonMap.cpp" />
     <ClCompile Include="PhotonMapTracing.cpp" />
     <ClCompile Include="SphereLight.cpp" />

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "PhotonMap.h"
+#include "IShape.h"
+#include "ILightSource.h"
+
 namespace Engine
 {
 	class PhotonMap;
