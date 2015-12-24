@@ -1,20 +1,19 @@
 #include "StdAfx.h"
 #include "Square.h"
 
+using namespace Engine;
 
-Square::Square(const Vector a, const Vector b, const Vector c, const Material* material, const Luminance& Le):
+Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const Material* material):
 	a(a),
 	ba(b - a),
 	ca(c - a),
 	normal((b - a).CrossProduct(c - a)),
 	n((b - a).CrossProduct(c - a).Normalize()),
-	probability((b - a).CrossProduct(c - a).Length()),
-	material(material),
-	Le(Le)
+	material(material)
 {
 }
 
-const HitPoint* Square::Intersection(const Vector& start, const Vector& direction) const
+const HitPoint* Shapes::Square::Intersection(const Vector& start, const Vector& direction) const
 {
 	GO_FLOAT t = 0;
 	GO_FLOAT t1 = 0;
@@ -48,18 +47,10 @@ const HitPoint* Square::Intersection(const Vector& start, const Vector& directio
 	
 	t = sa.DotProduct(normal) * factor;
 
-	if(t < GO_FLOAT_EPSILON)
+	if(t < 100 * GO_FLOAT_EPSILON)
 	{
 		return NULL;
 	}
 
 	return new HitPoint(t, n, material);
-}
-
-const LightPoint Square::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
-{
-	GO_FLOAT t1 = (GO_FLOAT) rand() / RAND_MAX;
-	GO_FLOAT t2 = (GO_FLOAT) rand() / RAND_MAX;
-
-	return LightPoint(a + t1 * ba + t2 * ca, probability, Le.colors[colorIndex]);
 }

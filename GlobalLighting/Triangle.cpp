@@ -1,20 +1,19 @@
 #include "StdAfx.h"
 #include "Triangle.h"
 
+using namespace Engine;
 
-Triangle::Triangle(const Vector a, const Vector b, const Vector c, const Material* material, const Luminance& Le): 
+Shapes::Triangle::Triangle(const Vector a, const Vector b, const Vector c, const Material* material): 
 	a(a),
 	ba(b - a),
 	ca(c - a),
 	normal((b - a).CrossProduct(c - a)),
 	n((b - a).CrossProduct(c - a).Normalize()),
-	probability((b - a).CrossProduct(c - a).Length() / 2),
-	material(material),
-	Le(Le)
+	material(material)
 {
 }
 
-const HitPoint* Triangle::Intersection(const Vector& start, const Vector& direction) const
+const HitPoint* Shapes::Triangle::Intersection(const Vector& start, const Vector& direction) const
 {
 	GO_FLOAT t = 0;
 	GO_FLOAT t1 = 0;
@@ -59,18 +58,4 @@ const HitPoint* Triangle::Intersection(const Vector& start, const Vector& direct
 	}
 
 	return new HitPoint(t, n, material);
-}
-
-const LightPoint Triangle::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
-{
-	GO_FLOAT t1 = (GO_FLOAT) rand() / RAND_MAX;
-	GO_FLOAT t2 = (GO_FLOAT) rand() / RAND_MAX;
-
-	if(t1 + t2 > 1)
-	{
-		t1 = 1 - t1;
-		t2 = 1 - t2;
-	}
-
-	return LightPoint(a + t1 * ba + t2 * ca, probability, Le.colors[colorIndex]);
 }

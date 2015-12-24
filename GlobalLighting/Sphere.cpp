@@ -4,19 +4,17 @@
 #include <math.h>
 #include "Sphere.h"
 
+using namespace Engine;
 
-Sphere::Sphere(const Vector& center, GO_FLOAT r, const Material* material, const Luminance& Le) :
+Shapes::Sphere::Sphere(const Vector& center, GO_FLOAT r, const Material* material) :
 	center(center),
 	material(material),
-	r(r),
 	r2(r * r),
-	rinv(1 / r),
-	probability(1 / (4 * M_PI * r * r)),
-	Le(Le)
+	rinv(1 / r)
 {
 }
 
-const HitPoint* Sphere::Intersection(const Vector& start, const Vector& direction) const
+const HitPoint* Shapes::Sphere::Intersection(const Vector& start, const Vector& direction) const
 {
 	Vector ac = start - center;
 	
@@ -44,13 +42,4 @@ const HitPoint* Sphere::Intersection(const Vector& start, const Vector& directio
 	}
 
 	return new HitPoint(t, (start + t * direction - center) * rinv, material);
-}
-
-const LightPoint Sphere::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
-{	
-	GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
-	GO_FLOAT sina = sqrt(1 - cosa * cosa);
-	GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
-
-	return LightPoint(center + r * Vector(cosa * cos(b), cosa * sin(b), sina), probability, Le.colors[colorIndex]);
 }

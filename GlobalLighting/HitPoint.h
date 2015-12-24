@@ -1,18 +1,23 @@
 #pragma once
+
+#include "Defines.h"
 #include "Vector.h"
 #include "Material.h"
 
-class HitPoint
+namespace Engine
 {
-public:
-	HitPoint(GO_FLOAT t, const Vector& normal, const Material* material) :
-		t(t),
-		normal(normal),
-		material(material)
+	class HitPoint
 	{
-	}
+	public:
+		HitPoint(GO_FLOAT t, const Vector& normal, const Material* material) :
+			t(t),
+			normal(normal),
+			material(material)
+		{
+		}
 
-	GO_FLOAT t;
-	const Vector normal;
-	const Material* material;
-};
+		GO_FLOAT t;
+		const Vector normal;
+		const Material* material;
+	};
+}

@@ -1,7 +1,24 @@
 #include "StdAfx.h"
 #include "CompositeLightSource.h"
 
-CompositeLightSource::CompositeLightSource(int nlights, const ILightSource* lights[], GO_FLOAT probabilities[]) :
+using namespace Engine;
+
+Lights::CompositeLightSource::CompositeLightSource(int nlights, const ILightSource* lights[]) :
+	nlights(nlights)
+{
+	this->lights = new const ILightSource*[nlights];
+	this->probabilities = new GO_FLOAT[nlights];
+	
+	GO_FLOAT p = 1 / (GO_FLOAT)nlights;
+
+	for(int i = 0; i < nlights; i++)
+	{
+		this->lights[i] = lights[i];
+		this->probabilities[i] = p;
+	}
+}
+
+Lights::CompositeLightSource::CompositeLightSource(int nlights, const ILightSource* lights[], GO_FLOAT probabilities[]) :
 	nlights(nlights)
 {
 	this->lights = new const ILightSource*[nlights];
@@ -23,13 +40,13 @@ CompositeLightSource::CompositeLightSource(int nlights, const ILightSource* ligh
 	}
 }
 
-CompositeLightSource::~CompositeLightSource()
+Lights::CompositeLightSource::~CompositeLightSource()
 {
 	delete[] lights;
 	delete[] probabilities;
 }
 
-const LightPoint CompositeLightSource::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
+const LightPoint Lights::CompositeLightSource::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
 {
 	GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
 
@@ -38,7 +55,7 @@ const LightPoint CompositeLightSource::SampleLightPoint(const HitPoint& hitPoint
 		if(ksi < probabilities[i])
 		{
 			const LightPoint& lp = lights[i]->SampleLightPoint(hitPoint, colorIndex);
-			return LightPoint(lp.point, probabilities[i] * lp.probability, lp.Le);
+			return LightPoint(lp.point, lp.normal, probabilities[i] * lp.probability, lp.Le);
 		}
 		else
 		{

@@ -1,19 +1,24 @@
 #pragma once
-#include "defines.h"
-#include "Luminance.h"
+
+#include "Defines.h"
 #include "Vector.h"
 
-class LightPoint
+namespace Engine
 {
-public:
-	LightPoint(const Vector& point, GO_FLOAT probability, GO_FLOAT Le) :
-		point(point),
-		probability(probability),
-		Le(Le)
+	class LightPoint
 	{
-	}
-
-	const Vector point;
-	const GO_FLOAT probability;
-	const GO_FLOAT Le;
-};
+	public:
+		LightPoint(const Vector& point, const Vector& normal, GO_FLOAT probability, GO_FLOAT Le) :
+			point(point),
+			normal(normal),
+			probability(probability),
+			Le(Le)
+		{
+		}
+			
+		const Vector point;
+		const Vector normal;
+		const GO_FLOAT probability;
+		const GO_FLOAT Le;
+	};
+}

@@ -18,6 +18,6 @@
 #include <tchar.h>
 
 //#include "MemoryManagerNew.h"
-#include "defines.h"
+#include "Defines.h"
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

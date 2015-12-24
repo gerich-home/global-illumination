@@ -3,16 +3,27 @@
 
 #include "stdafx.h"
 #include "GlobalLighting.h"
+
+#include "SimpleTracing.h"
+#include "Rasterizer.h"
+
 #include "Sphere.h"
 #include "Plane.h"
 #include "Triangle.h"
-#include "SimpleTracing.h"
-#include "Rasterizer.h"
-#include "Scene.h"
 #include "Square.h"
+#include "Scene.h"
+
+#include "SphereLight.h"
+#include "TriangleLight.h"
+#include "SquareLight.h"
+#include "CompositeLightSource.h"
+
 #include <time.h>
 
+using namespace Engine;
+
 IShape* scene;
+ILightSource* lights;
 
 #define W 640
 #define H 480
@@ -23,6 +34,7 @@ Luminance L[W * H];
 DWORD ThreadProc(LPVOID lpdwThreadParam);
 CRITICAL_SECTION CriticalSection;
 bool destroyed = false;
+bool inited = false;
 volatile int currentLine;
 bool busy[H];
 int frame[H];
@@ -140,47 +152,45 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	}
 
 
-	GO_FLOAT kd1[] = {0.8, 0.1, 0.9};
-	GO_FLOAT ks1[] = {0, 0, 0};
-	GO_FLOAT Le1[] = {0, 0, 0};
-	int      n1[]  = {0, 0, 0};
+	GO_FLOAT kd1[] = {0, 0, 0};
+	GO_FLOAT ks1[] = {1, 1, 1};
+	int      n1[]  = {5, 5, 5};
 
 	GO_FLOAT kd2[] = {0, 0, 0};
 	GO_FLOAT ks2[] = {0, 0, 0};
-	GO_FLOAT Le2[] = {35, 35, 35};
 	int      n2[]  = {0, 0, 0};
 	
 	GO_FLOAT kd3[] = {0.8, 0.8, 0.8};
 	GO_FLOAT ks3[] = {0, 0, 0};
-	GO_FLOAT Le3[] = {0, 0, 0};
 	int      n3[]  = {0, 0, 0};
+	
+	GO_FLOAT Le1[] = {10, 10, 10};
 
 	const IShape* shapes[] = {
-		//new Triangle(Vector(0, 0, 2), Vector(0, 1, 1), Vector(1, 0, 1), new Material(kd3, ks3, n3), Le3),
-		//floor
-		new Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), new Material(kd3, ks3, n3), Le3),
-		//ceiling
-		//new Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), new Material(kd3, ks3, n3), Le3),
-		//back wall
-		new Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), new Material(kd3, ks3, n3), Le3),
-		//left wall
-		new Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), new Material(kd3, ks3, n3), Le3),
-		//right wall
-		new Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), new Material(kd3, ks3, n3), Le3),
-		
-		new Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), new Material(kd2, ks2, n2), Le2),
-		
-		new Sphere(Vector(0, -0.4, 1.5), 0.1, new Material(kd1, ks1, n1), Le1),
-		
-		//new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, n1), Le1),
-		//new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, n1), Le1),
-		//new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, n3), Le3),*/
-		//new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, n2), Le2),
-		//new Sphere(Vector(-6, 0, -12), 1, new Material(kd2, ks2, n2), Le2)
-	};
 
-	scene = new Scene(sizeof(shapes) / sizeof(IShape*), shapes);
+		//floor
+		new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), new Material(kd3, ks3, n3)),
+		//ceiling
+		//new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), new Material(kd3, ks3, n3)),
+		//back wall
+		new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), new Material(kd3, ks3, n3)),
+		//left wall
+		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), new Material(kd3, ks3, n3)),
+		//right wall
+		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), new Material(kd3, ks3, n3)),
+		
+		new Shapes::Sphere(Vector(0, -0.4, 1.5), 0.1, new Material(kd1, ks1, n1)),
+	};
 	
+	const ILightSource* lightSources[] = {
+		new Lights::Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), Luminance(Le1)),
+	};
+	
+	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);
+	lights = new Lights::CompositeLightSource(sizeof(lightSources) / sizeof(ILightSource*), lightSources);
+	
+	srand(time(0));
+
 	InitializeCriticalSection(&CriticalSection);
 
 	for(int i = 0; i< WORKERS; i++)
@@ -191,6 +201,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
+	inited = true;
 	return TRUE;
 }
 
@@ -234,23 +245,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			hdc = BeginPaint(hWnd, &ps);
 
-			srand(time(0));
-			for(int j = r.top; j <= r.bottom; j++)
+			if(inited)
 			{
-				for(int i = 0; i < W; i++)
+				for(int j = r.top; j <= r.bottom && j < H; j++)
 				{
-					Luminance l = L[i * H + j] / frame[j];
-					SetPixel(hdc, i, j, RGB(l.r() > 1 ? 255 : l.r() * 255,
-											l.g() > 1 ? 255 : l.g() * 255,
-											l.b() > 1 ? 255 : l.b() * 255
-											));
-				}
-				SetPixel(hdc, 100, j, RGB(frame[j],
-										frame[j],
-										frame[j]
-										));
-			}
+					for(int i = r.left; i <= r.right && i < W; i++)
+					{
+						Luminance l = L[i * H + j] / frame[j];
+						SetPixel(hdc, i, j, RGB(l.r() > 1 ? 255 : l.r() * 255,
+												l.g() > 1 ? 255 : l.g() * 255,
+												l.b() > 1 ? 255 : l.b() * 255
+												));
+					}
 
+					SetPixel(hdc, 10, j, RGB((frame[j] % 2) * 255, 0, ((frame[j] + 1) % 2) * 255));
+				}
+			}
+			else
+			{
+				r.left = 0;
+				r.top = 0;
+				r.bottom = H - 1;
+				r.right = W - 1;
+				FillRect(hdc, &r, (HBRUSH) (GetStockObject(BLACK_BRUSH)));
+			}
 			EndPaint(hWnd, &ps);
 		}
 
@@ -300,8 +318,8 @@ DWORD ThreadProc(LPVOID lpdwThreadParam)
 		
 		if(j >= 0)
 		{
-			busy[j] = false;
 			frame[j]++;
+			busy[j] = false;
 		}
 
 		while(busy[currentLine])
@@ -321,7 +339,7 @@ DWORD ThreadProc(LPVOID lpdwThreadParam)
 
 		for(int i = 0; i < W && !destroyed; i++)
 		{
-			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 3, scene, engine);
+			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 3, scene, lights, engine);
 		}
 
 		RECT r;

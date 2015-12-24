@@ -1,16 +1,21 @@
 #pragma once
+
 #include "IShape.h"
 
-class Scene : public IShape
+namespace Shapes
 {
-public:
-	Scene(int nshapes, const IShape* shapes[]);
-	~Scene();
+	using namespace Engine;
+
+	class Scene : public IShape
+	{
+	public:
+		Scene(int nshapes, const IShape* shapes[]);
+		~Scene();
 	
-	virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
+		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
-private:
-	const IShape** shapes;
-	int nshapes;
-};
-
+	private:
+		const IShape** shapes;
+		int nshapes;
+	};
+}

@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include "Scene.h"
 
-Scene::Scene(int nshapes, const IShape* shapes[]) :
+using namespace Engine;
+
+Shapes::Scene::Scene(int nshapes, const IShape* shapes[]) :
 	nshapes(nshapes)
 {
 	this->shapes = new const IShape*[nshapes];
@@ -12,12 +14,12 @@ Scene::Scene(int nshapes, const IShape* shapes[]) :
 	}
 }
 
-Scene::~Scene()
+Shapes::Scene::~Scene()
 {
 	delete[] shapes;
 }
 
-const HitPoint* Scene::Intersection(const Vector& start, const Vector& direction) const
+const HitPoint* Shapes::Scene::Intersection(const Vector& start, const Vector& direction) const
 {
 	const HitPoint* bestHitPoint = NULL;
 	const HitPoint* hitPoint;

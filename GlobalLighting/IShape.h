@@ -1,9 +1,12 @@
 #pragma once
+
 #include "HitPoint.h"
 
-class IShape
+namespace Engine
 {
-public:
-	virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const = 0;
-};
-
+	class IShape
+	{
+	public:
+		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const = 0;
+	};
+}

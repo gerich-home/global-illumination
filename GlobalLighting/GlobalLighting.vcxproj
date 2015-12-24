@@ -87,6 +87,9 @@
     <ClInclude Include="LightPoint.h" />
     <ClInclude Include="Luminance.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="SphereLight.h" />
+    <ClInclude Include="SquareLight.h" />
+    <ClInclude Include="TriangleLight.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryManagerNew.h" />
     <ClInclude Include="Plane.h" />
@@ -104,6 +107,9 @@
   <ItemGroup>
     <ClCompile Include="ComposeLightSource.cpp" />
     <ClCompile Include="GlobalLighting.cpp" />
+    <ClCompile Include="SphereLight.cpp" />
+    <ClCompile Include="SquareLight.cpp" />
+    <ClCompile Include="TriangleLight.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Scene.cpp" />

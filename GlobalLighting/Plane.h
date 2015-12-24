@@ -1,25 +1,24 @@
 #pragma once
-#include "Vector.h"
+
 #include "IShape.h"
-#include "ILightSource.h"
 
-class Plane : public IShape, public ILightSource
+namespace Shapes
 {
-public:
-	Plane(const Vector& normal, GO_FLOAT d, const Material* material, const Luminance& Le = Luminance());
-	Plane(const Vector& a, const Vector& b, const Vector& A, const Material* material, const Luminance& Le = Luminance());
-	Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const Material* material, const Luminance& Le = Luminance());
+	using namespace Engine;
 
-	~Plane() { }
+	class Plane : public IShape
+	{
+	public:
+		Plane(const Vector& normal, GO_FLOAT d, const Material* material);
+		Plane(const Vector& a, const Vector& b, const Vector& A, const Material* material);
+		Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const Material* material);
 
-	virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
-	virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const;
+		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
-private:
-	GO_FLOAT d;
-	const Vector normal;
-	const Vector A;
-	const Material* material;
-	const Luminance Le;
+	private:
+		GO_FLOAT d;
+		const Vector normal;
+		const Vector A;
+		const Material* material;
+	};
 };
-
