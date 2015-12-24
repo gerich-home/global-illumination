@@ -154,8 +154,7 @@ PhotonMapNode* PhotonMap::CreateSubTree(int left, int right)
 	}
 }
 
-PhotonMap::PhotonMap(int nphotons, Photon* photons) :
-	photons(photons)
+void PhotonMap::Build()
 {
 	indexes[0] = new int[nphotons];
 	indexes[1] = new int[nphotons];
@@ -177,14 +176,32 @@ PhotonMap::PhotonMap(int nphotons, Photon* photons) :
 	delete[] indexes[0];
 	delete[] indexes[1];
 	delete[] indexes[2];
+	delete[] photons;
+}
+
+bool PhotonMap::Add(const Photon& photon)
+{
+	photons[current] = photon;
+
+	return (++current < nphotons);
+}
+
+PhotonMap::PhotonMap(int nphotons) :
+	nphotons(nphotons)
+{
+	photons = new Photon[nphotons];
+	current = 0;
 }
 
 PhotonMap::~PhotonMap()
 {
-	if(root != 0)
-		delete root;
+	
 }
 
+void PhotonMap::Clear()
+{
+	delete root;
+}
 void PhotonMap::GoDown(PhotonMapNode* node, ParamsForFind& paramsForFind) const
 {
 	short axis = node->axis;
