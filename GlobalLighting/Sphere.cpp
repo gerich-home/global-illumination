@@ -23,11 +23,6 @@ const HitPoint* Shapes::Sphere::Intersection(const Vector& start, const Vector& 
 
 	GO_FLOAT D = b * b - c;
 
-	if(c < GO_FLOAT_EPSILON)
-	{
-		return NULL;
-	}
-
 	if(D < 0)
 	{
 		return NULL;
@@ -36,9 +31,14 @@ const HitPoint* Shapes::Sphere::Intersection(const Vector& start, const Vector& 
 	D = sqrt(D);
 	GO_FLOAT t = -b - D;
 	
-	if(t < 0)
+	if(t < GO_FLOAT_EPSILON)
 	{
-		return NULL;
+		t = -b + D;
+	
+		if(t < GO_FLOAT_EPSILON)
+		{
+			return NULL;
+		}
 	}
 
 	return new HitPoint(t, (start + t * direction - center) * rinv, material);

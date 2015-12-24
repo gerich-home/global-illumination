@@ -20,6 +20,7 @@
 
 #include "DiffuseSpecularMaterial.h"
 #include "IdealMirrorMaterial.h"
+#include "IdealRefractorMaterial.h"
 #include "CheckeredMaterial.h"
 
 #include <time.h>
@@ -79,6 +80,28 @@ void InitScene()
 	int      n_white[]  = {0, 0, 0};
 	const IMaterial* m_white = new Materials::DuffuseSpecularMaterial(kd_white, ks_white, n_white);
 
+	const ITexturedMaterial* m_chess = new Materials::CheckeredMaterial(10, 10, m_white, m_black);
+	
+	GO_FLOAT kd_red[] = {1, 0, 0};
+	GO_FLOAT ks_red[] = {0, 0, 0};
+	int      n_red[]  = {0, 0, 0};
+	const IMaterial* m_red = new Materials::DuffuseSpecularMaterial(kd_red, ks_red, n_red);
+	
+	GO_FLOAT kd_blue[] = {0, 0, 1};
+	GO_FLOAT ks_blue[] = {0, 0, 0};
+	int      n_blue[]  = {0, 0, 0};
+	const IMaterial* m_blue = new Materials::DuffuseSpecularMaterial(kd_blue, ks_blue, n_blue);
+	
+	GO_FLOAT kd_green[] = {0, 1, 0};
+	GO_FLOAT ks_green[] = {0, 0, 0};
+	int      n_green[]  = {0, 0, 0};
+	const IMaterial* m_green = new Materials::DuffuseSpecularMaterial(kd_green, ks_green, n_green);
+
+	GO_FLOAT kd_yellow[] = {1, 1, 0};
+	GO_FLOAT ks_yellow[] = {0, 0, 0};
+	int      n_yellow[]  = {0, 0, 0};
+	const IMaterial* m_yellow = new Materials::DuffuseSpecularMaterial(kd_yellow, ks_yellow, n_yellow);
+
 	GO_FLOAT kd1[] = {0.9, 0.6, 0.3};
 	GO_FLOAT ks1[] = {0, 0, 0};
 	int      n1[]  = {0, 0, 0};
@@ -91,20 +114,25 @@ void InitScene()
 	
 	GO_FLOAT kd3[] = {0, 0, 0};
 	GO_FLOAT ks3[] = {1, 1, 1};
-	int      n3[]  = {100, 100, 100};
+	int      n3[]  = {1, 1, 1};
 	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
 	
-	GO_FLOAT Le1[] = {10, 10, 10};
+	GO_FLOAT rrefract[] = {1, 1, 1};
+	GO_FLOAT rreflect[] = {0, 0, 0};
+	GO_FLOAT refract = 1 / 1.5;
+	const IMaterial* m_refractor = new Materials::IdealRefractorMaterial(rreflect, rrefract, refract);
+
+	GO_FLOAT Le1[] = {20, 20, 20};
 	
-	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), new Materials::CheckeredMaterial(10, 10, m_white, m_black));
-	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m1);
-	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m1);
-	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m1);
-	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m1);
-		
+	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), m_chess);
+	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m_blue);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m_green);
+	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m_red);
+	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m_yellow);
+
 	const IShape* ball1 = new Shapes::Sphere(Vector(   0, -0.4, 1.3), 0.1,  m1);
-	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3,    0, 1.1), 0.15, m2);
-	const IShape* ball3 = new Shapes::Sphere(Vector(0.3, -0.3, 1.6), 0.2,  m3);
+	const IShape* ball2 = new Shapes::Sphere(Vector(0.15, 0.2, 1.5), 0.1, m2);
+	const IShape* ball3 = new Shapes::Sphere(Vector(0, -0.3, 1.5), 0.15, m_refractor);
 
 	const IShape* shapes[] = {
 		floor,
@@ -113,7 +141,7 @@ void InitScene()
 		leftWall,
 		rightWall,
 
-		ball1,
+		//ball1,
 		ball2,
 		ball3,
 	};

@@ -171,6 +171,9 @@
     <ClInclude Include="TexturedMaterialAdapter.h">
       <Filter>Заголовочные файлы\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="IdealRefractorMaterial.h">
+      <Filter>Заголовочные файлы\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GlobalLighting.cpp">
