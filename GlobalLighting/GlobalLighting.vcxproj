@@ -83,10 +83,12 @@
     <ClInclude Include="GlobalLighting.h" />
     <ClInclude Include="HitPoint.h" />
     <ClInclude Include="ILightSource.h" />
+    <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IShape.h" />
     <ClInclude Include="LightPoint.h" />
     <ClInclude Include="Luminance.h" />
-    <ClInclude Include="Material.h" />
+    <ClInclude Include="DiffuseSpecularMaterial.h" />
+    <ClInclude Include="RandomDirection.h" />
     <ClInclude Include="SphereLight.h" />
     <ClInclude Include="SquareLight.h" />
     <ClInclude Include="TriangleLight.h" />

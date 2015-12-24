@@ -9,7 +9,7 @@ namespace Shapes
 	class Sphere : public IShape
 	{
 	public:
-		Sphere(const Vector& center, GO_FLOAT r, const Material* material);
+		Sphere(const Vector& center, GO_FLOAT r, const IMaterial* material);
 	
 		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
@@ -17,6 +17,6 @@ namespace Shapes
 		const GO_FLOAT r2;
 		const GO_FLOAT rinv;
 		const Vector center;
-		const Material* material;
+		const IMaterial* material;
 	};
 }

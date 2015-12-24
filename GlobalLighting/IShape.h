@@ -4,6 +4,9 @@
 
 namespace Engine
 {
+	class Vector;
+	class HitPoint;
+
 	class IShape
 	{
 	public:

@@ -9,9 +9,9 @@ namespace Shapes
 	class Plane : public IShape
 	{
 	public:
-		Plane(const Vector& normal, GO_FLOAT d, const Material* material);
-		Plane(const Vector& a, const Vector& b, const Vector& A, const Material* material);
-		Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const Material* material);
+		Plane(const Vector& normal, GO_FLOAT d, const IMaterial* material);
+		Plane(const Vector& a, const Vector& b, const Vector& A, const IMaterial* material);
+		Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const IMaterial* material);
 
 		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
@@ -19,6 +19,6 @@ namespace Shapes
 		GO_FLOAT d;
 		const Vector normal;
 		const Vector A;
-		const Material* material;
+		const IMaterial* material;
 	};
 };

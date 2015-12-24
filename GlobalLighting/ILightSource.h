@@ -5,6 +5,9 @@
 
 namespace Engine
 {
+	class LightPoint;
+	class HitPoint;
+
 	class ILightSource
 	{
 	public:

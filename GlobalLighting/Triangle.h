@@ -9,7 +9,7 @@ namespace Shapes
 	class Triangle: public IShape
 	{
 	public:
-		Triangle(const Vector a, const Vector b, const Vector c, const Material* material);
+		Triangle(const Vector a, const Vector b, const Vector c, const IMaterial* material);
 
 		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
@@ -19,6 +19,6 @@ namespace Shapes
 		const Vector ba;
 		const Vector ca;
 		const Vector a;
-		const Material* material;
+		const IMaterial* material;
 	};
 }

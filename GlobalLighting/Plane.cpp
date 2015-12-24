@@ -3,7 +3,7 @@
 
 using namespace Engine;
 
-Shapes::Plane::Plane(const Vector& normal, GO_FLOAT d, const Material* material) :
+Shapes::Plane::Plane(const Vector& normal, GO_FLOAT d, const IMaterial* material) :
 	normal(normal),
 	d(d),
 	A( (normal.x != 0 ? -d / normal.x : 0                                              ),
@@ -14,7 +14,7 @@ Shapes::Plane::Plane(const Vector& normal, GO_FLOAT d, const Material* material)
 {
 }
 
-Shapes::Plane::Plane(const Vector& a, const Vector& b, const Vector& A, const Material* material) :
+Shapes::Plane::Plane(const Vector& a, const Vector& b, const Vector& A, const IMaterial* material) :
 	normal(a.CrossProduct(b).Normalize()),
 	A(A),
 	material(material)
@@ -22,7 +22,7 @@ Shapes::Plane::Plane(const Vector& a, const Vector& b, const Vector& A, const Ma
 	d = A.DotProduct(normal);
 }
 
-Shapes::Plane::Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const Material* material):
+Shapes::Plane::Plane(GO_FLOAT a, GO_FLOAT b, GO_FLOAT c, GO_FLOAT d, const IMaterial* material):
 	normal(Vector(a, b, c).Normalize()),
 	d(d),
 	material(material),

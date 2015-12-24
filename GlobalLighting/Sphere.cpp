@@ -6,7 +6,7 @@
 
 using namespace Engine;
 
-Shapes::Sphere::Sphere(const Vector& center, GO_FLOAT r, const Material* material) :
+Shapes::Sphere::Sphere(const Vector& center, GO_FLOAT r, const IMaterial* material) :
 	center(center),
 	material(material),
 	r2(r * r),

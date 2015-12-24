@@ -3,7 +3,7 @@
 
 using namespace Engine;
 
-Shapes::Triangle::Triangle(const Vector a, const Vector b, const Vector c, const Material* material): 
+Shapes::Triangle::Triangle(const Vector a, const Vector b, const Vector c, const IMaterial* material): 
 	a(a),
 	ba(b - a),
 	ca(c - a),

@@ -6,6 +6,9 @@
 
 namespace Engine
 {
+	class Vector;
+	class Luminance;
+
 	class LightPoint
 	{
 	public:

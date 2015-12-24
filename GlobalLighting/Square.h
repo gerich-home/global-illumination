@@ -9,7 +9,7 @@ namespace Shapes
 	class Square: public IShape
 	{
 	public:
-		Square(const Vector a, const Vector b, const Vector c, const Material* material);
+		Square(const Vector a, const Vector b, const Vector c, const IMaterial* material);
 
 		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
@@ -19,6 +19,6 @@ namespace Shapes
 		const Vector ca;
 		const Vector normal;
 		const Vector n;
-		const Material* material;
+		const IMaterial* material;
 	};
 }

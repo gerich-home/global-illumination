@@ -31,6 +31,12 @@
     <Filter Include="Заголовочные файлы\Lights">
       <UniqueIdentifier>{56f4133a-802b-4102-b19a-49314268c043}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Заголовочные файлы\Materials">
+      <UniqueIdentifier>{62619792-cb79-418d-bb64-290f42f4c7d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Materials">
+      <UniqueIdentifier>{881f13a4-6dda-4e3a-8bee-c23b8a803b52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -108,9 +114,6 @@
     <ClInclude Include="Luminance.h">
       <Filter>Заголовочные файлы\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Заголовочные файлы\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Rasterizer.h">
       <Filter>Заголовочные файлы\Engine</Filter>
     </ClInclude>
@@ -119,6 +122,15 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="IMaterial.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomDirection.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffuseSpecularMaterial.h">
+      <Filter>Заголовочные файлы\Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

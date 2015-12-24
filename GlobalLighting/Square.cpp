@@ -3,7 +3,7 @@
 
 using namespace Engine;
 
-Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const Material* material):
+Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const IMaterial* material):
 	a(a),
 	ba(b - a),
 	ca(c - a),
