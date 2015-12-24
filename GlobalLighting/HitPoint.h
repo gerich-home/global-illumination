@@ -17,7 +17,7 @@ namespace Engine
 		}
 
 		GO_FLOAT t;
-		const Vector normal;
+		Vector normal;
 		const Material* material;
 	};
 }

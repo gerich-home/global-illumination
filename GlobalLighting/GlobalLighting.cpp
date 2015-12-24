@@ -26,7 +26,10 @@ IShape* scene;
 ILightSource* lights;
 
 #define W 640
-#define H 480
+#define H 640
+#define CAM_Z 6
+#define CAM_SIZE 0.5
+#define PIXEL_SIZE 1.05
 #define WORKERS 8
 
 Luminance L[W * H];
@@ -121,7 +124,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GLOBALLIGHTING));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_GLOBALLIGHTING);
+	wcex.lpszMenuName	= 0; //MAKEINTRESOURCE(IDC_GLOBALLIGHTING);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -143,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	hInst = hInstance; // —охранить дескриптор экземпл€ра в глобальной переменной
 
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+		50, 20, W, H + 20, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
@@ -151,45 +154,45 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	}
 
 
-	GO_FLOAT kd1[] = {0, 1, 0};
-	GO_FLOAT ks1[] = {1, 0, 1};
-	int      n1[]  = {5, 10, 15};
+	GO_FLOAT kd1[] = {0.9, 0.6, 0.3};
+	GO_FLOAT ks1[] = {0, 0, 0};
+	int      n1[]  = {0, 0, 0};
 	const Material* m1 = new Material(kd1, ks1, n1);
 
-	GO_FLOAT kd2[] = {0.5, 0.5, 0};
-	GO_FLOAT ks2[] = {0.5, 0, 0.3};
-	int      n2[]  = {10, 0, 40};
+	GO_FLOAT kd2[] = {0.6, 0.1, 1};
+	GO_FLOAT ks2[] = {0, 0, 0};
+	int      n2[]  = {0, 0, 0};
 	const Material* m2 = new Material(kd2, ks2, n2);
 	
 	GO_FLOAT kd3[] = {0, 0, 0};
 	GO_FLOAT ks3[] = {1, 1, 1};
-	int      n3[]  = {10, 10, 10};
+	int      n3[]  = {1000, 1000, 1000};
 	const Material* m3 = new Material(kd3, ks3, n3);
 	
-	GO_FLOAT Le1[] = {5, 5, 5};
+	GO_FLOAT Le1[] = {20, 20, 20};
 
 	const IShape* shapes[] = {
-
 		//floor
-		new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), m3),
+		new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 10), Vector(0.5,  -0.5, 1), m1),
 		//ceiling
-		//new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), m3),
+		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 10), m1),
 		//back wall
-		new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), m3),
+		new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10), Vector(0.5,  -0.5, 10), m3),
 		//left wall
-		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), m2),
+		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 10), Vector(-0.5, -0.5, 1), m1),
 		//right wall
-		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), m1),
+		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 10), m1),
 		
-		new Shapes::Sphere(Vector(0, -0.4, 1.5), 0.1, m3),
-		new Shapes::Sphere(Vector(0.25, 0.2, 1.7), 0.1, m2),
-		new Shapes::Sphere(Vector(-0.3, 0.2, 1.7), 0.05, m1),
+		new Shapes::Sphere(Vector(0, -0.4, 8), 0.1, m1),
+		new Shapes::Sphere(Vector(-0.3, 0, 3), 0.15, m2),
+		//new Shapes::Sphere(Vector(-0.3, -0.2, 4), 0.3, m3),
 	};
 	
 	const ILightSource* lightSources[] = {
-		//new Lights::Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), Luminance(Le1)),
-		new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
-		new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
+		new Lights::Square(Vector(-0.15, 0.45, 3.35), Vector(0.15,  0.45, 3.35), Vector(-0.15, 0.45, 3.65), Luminance(Le1)),
+		new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
+		//new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
+		//new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
 	};
 	
 	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);
@@ -360,7 +363,7 @@ DWORD ThreadProc(LPVOID lpdwThreadParam)
 
 		for(int i = 0; i < W && !destroyed; i++)
 		{
-			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 6, scene, lights, engine);
+			L[i * H + j] += ColorAtPixel(i + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, j + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, W, H, CAM_Z, CAM_SIZE, scene, lights, engine);
 		}
 	}
 
