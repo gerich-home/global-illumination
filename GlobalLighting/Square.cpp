@@ -1,15 +1,26 @@
 #include "StdAfx.h"
 #include "Square.h"
+#include "TexturedMaterialAdapter.h"
 
 using namespace Engine;
 
-Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const IMaterial* material):
+Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const ITexturedMaterial* material):
 	a(a),
 	ba(b - a),
 	ca(c - a),
 	normal((b - a).CrossProduct(c - a)),
 	n((b - a).CrossProduct(c - a).Normalize()),
 	material(material)
+{
+}
+	
+Shapes::Square::Square(const Vector a, const Vector b, const Vector c, const IMaterial* material):
+	a(a),
+	ba(b - a),
+	ca(c - a),
+	normal((b - a).CrossProduct(c - a)),
+	n((b - a).CrossProduct(c - a).Normalize()),
+	material(new Materials::TexturedMaterialAdapter(material))
 {
 }
 
@@ -52,5 +63,5 @@ const HitPoint* Shapes::Square::Intersection(const Vector& start, const Vector& 
 		return NULL;
 	}
 
-	return new HitPoint(t, n, material);
+	return new HitPoint(t, n, material->MaterialAt(t1, t2));
 }

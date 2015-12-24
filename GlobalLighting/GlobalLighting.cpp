@@ -20,6 +20,7 @@
 
 #include "DiffuseSpecularMaterial.h"
 #include "IdealMirrorMaterial.h"
+#include "CheckeredMaterial.h"
 
 #include <time.h>
 
@@ -64,6 +65,95 @@ ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+
+
+void InitScene()
+{
+	GO_FLOAT kd_black[] = {0, 0, 0};
+	GO_FLOAT ks_black[] = {0, 0, 0};
+	int      n_black[]  = {0, 0, 0};
+	const IMaterial* m_black = new Materials::DuffuseSpecularMaterial(kd_black, ks_black, n_black);
+
+	GO_FLOAT kd_white[] = {1, 1, 1};
+	GO_FLOAT ks_white[] = {0, 0, 0};
+	int      n_white[]  = {0, 0, 0};
+	const IMaterial* m_white = new Materials::DuffuseSpecularMaterial(kd_white, ks_white, n_white);
+
+	GO_FLOAT kd1[] = {0.9, 0.6, 0.3};
+	GO_FLOAT ks1[] = {0, 0, 0};
+	int      n1[]  = {0, 0, 0};
+	const IMaterial* m1 = new Materials::DuffuseSpecularMaterial(kd1, ks1, n1);
+
+	GO_FLOAT kd2[] = {0.6, 0.1, 1};
+	GO_FLOAT ks2[] = {0, 0, 0};
+	int      n2[]  = {0, 0, 0};
+	const IMaterial* m2 = new Materials::DuffuseSpecularMaterial(kd2, ks2, n2);
+	
+	GO_FLOAT kd3[] = {0, 0, 0};
+	GO_FLOAT ks3[] = {1, 1, 1};
+	int      n3[]  = {100, 100, 100};
+	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
+	
+	GO_FLOAT Le1[] = {10, 10, 10};
+	
+	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), new Materials::CheckeredMaterial(10, 10, m_white, m_black));
+	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m1);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m1);
+	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m1);
+	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m1);
+		
+	const IShape* ball1 = new Shapes::Sphere(Vector(   0, -0.4, 1.3), 0.1,  m1);
+	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3,    0, 1.1), 0.15, m2);
+	const IShape* ball3 = new Shapes::Sphere(Vector(0.3, -0.3, 1.6), 0.2,  m3);
+
+	const IShape* shapes[] = {
+		floor,
+		ceiling,
+		backWall,
+		leftWall,
+		rightWall,
+
+		ball1,
+		ball2,
+		ball3,
+	};
+	
+	const IShape* glossyShapes[] = {
+		//floor,
+		//ceiling,
+		//backWall,
+		//leftWall,
+		//rightWall,
+
+		//ball1,
+		//ball2,
+		ball3,
+	};
+	
+	const IShape* diffuseShapes[] = {
+		floor,
+		ceiling,
+		backWall,
+		leftWall,
+		rightWall,
+
+		ball1,
+		ball2,
+		//ball3,
+	};
+	
+	const ILightSource* lightSources[] = {
+		new Lights::Square(Vector(-0.15, 0.5 - GO_FLOAT_EPSILON, 1.35), Vector(0.15,  0.5 - GO_FLOAT_EPSILON, 1.35), Vector(-0.15, 0.5 - GO_FLOAT_EPSILON, 1.65), Luminance(Le1)),
+		//new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
+		//new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
+		//new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
+	};
+	
+	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);
+	glossy = new Shapes::Scene(sizeof(glossyShapes) / sizeof(IShape*), glossyShapes);
+	diffuse = new Shapes::Scene(sizeof(diffuseShapes) / sizeof(IShape*), diffuseShapes);
+	lights = new Lights::CompositeLightSource(sizeof(lightSources) / sizeof(ILightSource*), lightSources);
+}
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -161,81 +251,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 	
-	GO_FLOAT kd1[] = {0.9, 0.6, 0.3};
-	GO_FLOAT ks1[] = {0, 0, 0};
-	int      n1[]  = {0, 0, 0};
-	const IMaterial* m1 = new Materials::DuffuseSpecularMaterial(kd1, ks1, n1);
+	InitScene();
 
-	GO_FLOAT kd2[] = {0.6, 0.1, 1};
-	GO_FLOAT ks2[] = {0, 0, 0};
-	int      n2[]  = {0, 0, 0};
-	const IMaterial* m2 = new Materials::DuffuseSpecularMaterial(kd2, ks2, n2);
-	
-	GO_FLOAT kd3[] = {0, 0, 0};
-	GO_FLOAT ks3[] = {1, 1, 1};
-	int      n3[]  = {10, 10, 10};
-	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
-	
-	GO_FLOAT Le1[] = {40, 40, 40};
-	
-	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), m1);
-	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m1);
-	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m1);
-	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m1);
-	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m1);
-		
-	const IShape* ball1 = new Shapes::Sphere(Vector(   0, -0.4, 1.3), 0.1,  m1);
-	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3,    0, 1.1), 0.15, m2);
-	const IShape* ball3 = new Shapes::Sphere(Vector(0.3, -0.2, 1.2), 0.3,  m3);
-
-	const IShape* shapes[] = {
-		floor,
-		ceiling,
-		backWall,
-		leftWall,
-		rightWall,
-
-		ball1,
-		ball2,
-		ball3,
-	};
-	
-	const IShape* glossyShapes[] = {
-		//floor,
-		//ceiling,
-		//backWall,
-		//leftWall,
-		//rightWall,
-
-		//ball1,
-		//ball2,
-		ball3,
-	};
-	
-	const IShape* diffuseShapes[] = {
-		floor,
-		ceiling,
-		backWall,
-		leftWall,
-		rightWall,
-
-		ball1,
-		ball2,
-		//ball3,
-	};
-	
-	const ILightSource* lightSources[] = {
-		new Lights::Square(Vector(-0.15, 0.45, 0.35), Vector(0.15,  0.45, 0.35), Vector(-0.15, 0.45, 0.65), Luminance(Le1)),
-		//new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
-		//new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
-		//new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
-	};
-	
-	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);
-	glossy = new Shapes::Scene(sizeof(glossyShapes) / sizeof(IShape*), glossyShapes);
-	diffuse = new Shapes::Scene(sizeof(diffuseShapes) / sizeof(IShape*), diffuseShapes);
-	lights = new Lights::CompositeLightSource(sizeof(lightSources) / sizeof(ILightSource*), lightSources);
-	
 	engine = new Engines::SimpleTracing();
 
 	srand(SEED);

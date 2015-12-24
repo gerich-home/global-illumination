@@ -162,6 +162,15 @@
     <ClInclude Include="IdealMirrorMaterial.h">
       <Filter>Заголовочные файлы\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="ITexturedMaterial.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckeredMaterial.h">
+      <Filter>Заголовочные файлы\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="TexturedMaterialAdapter.h">
+      <Filter>Заголовочные файлы\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GlobalLighting.cpp">

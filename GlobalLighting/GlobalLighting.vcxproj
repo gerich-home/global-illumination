@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CausticPhotonMapBuilder.h" />
+    <ClInclude Include="CheckeredMaterial.h" />
     <ClInclude Include="CompositeLightSource.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="GlobalPhotonMapBuilder.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IPhotonMapBuilder.h" />
     <ClInclude Include="IShape.h" />
+    <ClInclude Include="ITexturedMaterial.h" />
     <ClInclude Include="LightPoint.h" />
     <ClInclude Include="Luminance.h" />
     <ClInclude Include="DiffuseSpecularMaterial.h" />
@@ -98,6 +100,7 @@
     <ClInclude Include="RandomDirection.h" />
     <ClInclude Include="SphereLight.h" />
     <ClInclude Include="SquareLight.h" />
+    <ClInclude Include="TexturedMaterialAdapter.h" />
     <ClInclude Include="TriangleLight.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryManagerNew.h" />

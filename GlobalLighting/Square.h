@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IShape.h"
+#include "ITexturedMaterial.h"
 
 namespace Shapes
 {
@@ -9,6 +10,7 @@ namespace Shapes
 	class Square: public IShape
 	{
 	public:
+		Square(const Vector a, const Vector b, const Vector c, const ITexturedMaterial* material);
 		Square(const Vector a, const Vector b, const Vector c, const IMaterial* material);
 
 		virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
@@ -19,6 +21,6 @@ namespace Shapes
 		const Vector ca;
 		const Vector normal;
 		const Vector n;
-		const IMaterial* material;
+		const ITexturedMaterial* material;
 	};
 }
