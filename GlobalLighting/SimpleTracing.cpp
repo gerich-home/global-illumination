@@ -6,8 +6,8 @@
 #include <math.h>
 
 
-#define N 40
-#define MAX_DEEP 4
+#define N 30
+#define MAX_DEEP 3
 
 SimpleTracing::SimpleTracing(void)
 {

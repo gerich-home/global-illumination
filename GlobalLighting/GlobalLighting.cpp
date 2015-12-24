@@ -16,7 +16,7 @@ IShape* scene;
 
 #define W 640
 #define H 480
-#define WORKERS 4
+#define WORKERS 8
 
 Luminance L[W * H];
 
@@ -140,30 +140,41 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	}
 
 
-	GO_FLOAT kd1[] = {0.5, 0.5, 0.5};
-	GO_FLOAT ks1[] = {0.5, 0.5, 0.5};
+	GO_FLOAT kd1[] = {0.8, 0.1, 0.9};
+	GO_FLOAT ks1[] = {0, 0, 0};
 	GO_FLOAT Le1[] = {0, 0, 0};
-	int      n1[]  = {100, 100, 100};
+	int      n1[]  = {0, 0, 0};
 
 	GO_FLOAT kd2[] = {0, 0, 0};
 	GO_FLOAT ks2[] = {0, 0, 0};
-	GO_FLOAT Le2[] = {100, 100, 100};
+	GO_FLOAT Le2[] = {35, 35, 35};
 	int      n2[]  = {0, 0, 0};
 	
-	GO_FLOAT kd3[] = {1, 1, 1};
+	GO_FLOAT kd3[] = {0.8, 0.8, 0.8};
 	GO_FLOAT ks3[] = {0, 0, 0};
 	GO_FLOAT Le3[] = {0, 0, 0};
 	int      n3[]  = {0, 0, 0};
 
 	const IShape* shapes[] = {
 		//new Triangle(Vector(0, 0, 2), Vector(0, 1, 1), Vector(1, 0, 1), new Material(kd3, ks3, Le3, n3)),
-		new Square(Vector(-0.5, -0.5, 1),    Vector(-0.5, -0.5, 2),    Vector(0.5,  -0.5, 1),    new Material(kd3, ks3, Le3, n3)),
-		new Square(Vector(-0.5,  0.5, 1),    Vector(0.5,   0.5, 1),    Vector(-0.5,  0.5, 2),    new Material(kd3, ks3, Le3, n3)),
+		//floor
+		new Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), new Material(kd3, ks3, Le3, n3)),
+		//ceiling
+		//new Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		//back wall
+		new Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		//left wall
+		new Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), new Material(kd3, ks3, Le3, n3)),
+		//right wall
+		new Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		
 		new Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), new Material(kd2, ks2, Le2, n2)),
-		/*new Sphere(Vector(0, 0, 3), 1, new Material(kd1, ks1, Le1, n1)),
-		new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, Le1, n1)),
-		new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, Le1, n1)),
-		new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, Le3, n3)),*/
+		
+		new Sphere(Vector(0, -0.4, 1.5), 0.1, new Material(kd1, ks1, Le1, n1)),
+		
+		//new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, Le1, n1)),
+		//new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, Le1, n1)),
+		//new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, Le3, n3)),*/
 		//new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, Le2, n2)),
 		//new Sphere(Vector(-6, 0, -12), 1, new Material(kd2, ks2, Le2, n2))
 	};
