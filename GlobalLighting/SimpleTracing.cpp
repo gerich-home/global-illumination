@@ -17,11 +17,6 @@ Luminance SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector
 	{
 		Luminance direct;
 
-		if(current_point.z == 10)
-		{
-			int sdfg = 120;
-		}
-
 		for(int i = 0; i < SHADOW_RAYS; i++)
 		{	
 			const LightPoint& lp = lights.SampleLightPoint(current_hp);
