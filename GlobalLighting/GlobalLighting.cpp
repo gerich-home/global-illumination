@@ -35,7 +35,6 @@ DWORD ThreadProc(LPVOID lpdwThreadParam);
 CRITICAL_SECTION CriticalSection;
 bool destroyed = false;
 bool inited = false;
-volatile int currentLine;
 bool busy[H];
 int frame[H];
 
@@ -195,6 +194,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	lights = new Lights::CompositeLightSource(sizeof(lightSources) / sizeof(ILightSource*), lightSources);
 	
 	srand(time(0));
+	
+	ZeroMemory(&frame, sizeof(frame));
+	ZeroMemory(&busy, sizeof(busy));
 
 	InitializeCriticalSection(&CriticalSection);
 
@@ -256,10 +258,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					for(int i = r.left; i <= r.right && i < W; i++)
 					{
-						Luminance l = L[i * H + j] / frame[j];
-						SetPixel(hdc, i, j, RGB(l.r() > 1 ? 255 : l.r() * 255,
-												l.g() > 1 ? 255 : l.g() * 255,
-												l.b() > 1 ? 255 : l.b() * 255
+						Luminance l = L[i * H + j] * (255.0 / frame[j]);
+						SetPixel(hdc, i, j, RGB(l.r() > 255 ? 255 : l.r(),
+												l.g() > 255 ? 255 : l.g(),
+												l.b() > 255 ? 255 : l.b()
 												));
 					}
 
@@ -279,6 +281,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		break;
 	case WM_DESTROY:
+		destroyed = true;
 		PrintMemoryTable();
 		PostQuitMessage(0);
 		break;
@@ -323,36 +326,39 @@ DWORD ThreadProc(LPVOID lpdwThreadParam)
 		
 		if(j >= 0)
 		{
-			frame[j]++;
 			busy[j] = false;
+			frame[j]++;
+
+			RECT r;
+			r.left   = 0;
+			r.top    = j;
+			r.right  = W;
+			r.bottom = j + 1;
+			InvalidateRect(hWnd, &r, false);
 		}
+		
+		j = -1;
 
-		while(busy[currentLine])
-		{	
-			currentLine++;
-
-			if(currentLine == H)
+		for(int i = 0; i < H; i++)
+		{
+			if(!busy[i])
 			{
-				currentLine = 0;
+				if(j < 0 || frame[i] < frame[j])
+				{
+					j = i;
+				}
+
 			}
 		}
 
-		j = currentLine;
 		busy[j] = true;
 
 		LeaveCriticalSection(&CriticalSection);
 
 		for(int i = 0; i < W && !destroyed; i++)
 		{
-			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 3, scene, lights, engine);
+			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 6, scene, lights, engine);
 		}
-
-		RECT r;
-		r.left   = 0;
-		r.top    = j;
-		r.right  = W;
-		r.bottom = j + 1;
-		InvalidateRect(hWnd, &r, false);
 	}
 
 	return 0;

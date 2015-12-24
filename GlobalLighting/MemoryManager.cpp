@@ -75,7 +75,7 @@ void PrintMemoryUsage()
 	fclose(file);
 }
 
-void* __taluMalloc(size_t size, const char * file, size_t line)
+void* __Malloc(size_t size, const char * file, size_t line)
 {
 	InitMutex();
     
@@ -96,7 +96,7 @@ void* __taluMalloc(size_t size, const char * file, size_t line)
 	return newItem->ptr;
 }
 
-void __taluFree(void* ptr)
+void __Free(void* ptr)
 {
 	InitMutex();
 	EnterCriticalSection(&cs);
@@ -122,20 +122,20 @@ void __taluFree(void* ptr)
 	free(ptr);
 }
 
-void* __taluRealloc(void* ptr, size_t newsize, const char * file, size_t line)
+void* __Realloc(void* ptr, size_t newsize, const char * file, size_t line)
 {
 	InitMutex();
 	EnterCriticalSection(&cs);
 
 	if(newsize == 0)
 	{
-		__taluFree(ptr);
+		__Free(ptr);
 		return 0;
 	}
 
 	if(!ptr)
 	{
-		return __taluMalloc(newsize, file, line);
+		return __Malloc(newsize, file, line);
 	}
 
 	memoryRecord* current = memoryList.next;
@@ -157,12 +157,17 @@ void* __taluRealloc(void* ptr, size_t newsize, const char * file, size_t line)
 	return current->ptr;
 }
 
+
+#if USE_MEMORY_MANAGER
+
 void* operator new(size_t size)
 {
-	return  __taluMalloc(size, __file__, __line__);
+	return  __Malloc(size, __file__, __line__);
 }
 
 void operator delete(void* ptr)
 {
-	return __taluFree(ptr);	
+	return __Free(ptr);	
 }
+
+#endif
