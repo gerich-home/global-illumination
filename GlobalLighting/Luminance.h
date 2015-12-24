@@ -77,7 +77,16 @@ namespace Engine
 		{
 			return Luminance(l.colors[L_R] * colors[L_R], l.colors[L_G] * colors[L_G], l.colors[L_B] * colors[L_B]);
 		}
-	
+		
+		Luminance& operator *=(const Luminance& l)
+		{
+			colors[L_R] *= l.colors[L_R];
+			colors[L_G] *= l.colors[L_G];
+			colors[L_B] *= l.colors[L_B];
+
+			return *this;
+		}
+
 		Luminance operator *(GO_FLOAT alpha) const
 		{
 			return Luminance(alpha * colors[L_R], alpha * colors[L_G], alpha * colors[L_B]);

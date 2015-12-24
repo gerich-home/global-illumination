@@ -21,121 +21,135 @@ SimpleTracing::~SimpleTracing(void)
 Luminance SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights)
 {
 	Luminance result;
+	Luminance direct;
+	Luminance factor(1, 1, 1);
+	Vector current_point = point;
+	Vector current_direction = direction;
+	HitPoint current_hp = hp;
 
-	for(int i = 0; i < SHADOW_RAYS; i++)
+	while(true)
 	{
-		const LightPoint& lp = lights->SampleLightPoint(hp);
-		Vector ndirection = lp.point - point;
-		
-		GO_FLOAT cos_dir_normal = hp.normal.DotProduct(ndirection);
-		
-		if(cos_dir_normal < 0)
-		{
-			continue;
-		}
+		for(int i = 0; i < SHADOW_RAYS; i++)
+		{	
+			const LightPoint& lp = lights->SampleLightPoint(current_hp);
+			Vector ndirection = lp.point - current_point;
 
-		GO_FLOAT cos_dir_lnormal = -(ndirection.DotProduct(lp.normal));
-		if(cos_dir_lnormal < 0)
-		{
-			continue;
-		}
+			GO_FLOAT cos_dir_normal = current_hp.normal.DotProduct(ndirection);
 
-		GO_FLOAT l = ndirection.Length();
-		if(l < GO_FLOAT_EPSILON)
-		{
-			continue;
-		}
-
-		GO_FLOAT factor = 1 / l;
-		ndirection *= factor;
-		cos_dir_normal *= factor;
-		cos_dir_lnormal *= factor;
-
-		const HitPoint* nhp = scene->Intersection(point, ndirection);
-
-		if(nhp)
-		{
-			if(nhp->t > l - GO_FLOAT_EPSILON)
+			if(cos_dir_normal < 0)
 			{
-				delete nhp;
-			}
-			else
-			{
-				delete nhp;
 				continue;
 			}
+
+			GO_FLOAT cos_dir_lnormal = -(ndirection.DotProduct(lp.normal));
+			if(cos_dir_lnormal < 0)
+			{
+				continue;
+			}
+
+			GO_FLOAT l = ndirection.Length();
+			if(l < GO_FLOAT_EPSILON)
+			{
+				continue;
+			}
+
+			GO_FLOAT linv = 1 / l;
+			ndirection *= linv;
+			cos_dir_normal *= linv;
+			cos_dir_lnormal *= linv;
+
+			const HitPoint* nhp = scene->Intersection(current_point, ndirection);
+
+			if(nhp)
+			{
+				if(nhp->t > l - GO_FLOAT_EPSILON)
+				{
+					delete nhp;
+				}
+				else
+				{
+					delete nhp;
+					continue;
+				}
+			}
+
+			const GO_FLOAT cosphi = current_hp.normal.DotProduct((ndirection - current_direction).Normalize());
+
+			direct += lp.Le * (Luminance(current_hp.material->rd) / M_PI + Luminance(
+				current_hp.material->ks[L_R] == 0 ? 0 : current_hp.material->ks[L_R] * pow(cosphi, current_hp.material->n[L_R]),
+				current_hp.material->ks[L_G] == 0 ? 0 : current_hp.material->ks[L_G] * pow(cosphi, current_hp.material->n[L_G]),
+				current_hp.material->ks[L_B] == 0 ? 0 : current_hp.material->ks[L_B] * pow(cosphi, current_hp.material->n[L_B])
+				)) * (cos_dir_normal * cos_dir_lnormal / (lp.probability * l * l));
+		}
+		direct /= SHADOW_RAYS;
+		
+		result += factor * direct;
+
+		//Compute indirect luminancy
+
+		GO_FLOAT qd = (current_hp.material->rd[L_R] + current_hp.material->rd[L_G] + current_hp.material->rd[L_B]) / 3;
+		GO_FLOAT qs = (current_hp.material->ks[L_R] + current_hp.material->ks[L_G] + current_hp.material->ks[L_B]) / 3;
+
+		if(qd + qs + MIN_ABSOPTION > 1)
+		{
+			GO_FLOAT k = (1 - MIN_ABSOPTION) / (qd + qs);
+			qd *= k;
+			qs *= k; 
 		}
 
-		const GO_FLOAT cosphi = hp.normal.DotProduct((ndirection - direction).Normalize());
+		GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
 
-		result += lp.Le * (Luminance(hp.material->rd) / M_PI + Luminance(
-			hp.material->ks[L_R] == 0 ? 0 : hp.material->ks[L_R] * pow(cosphi, hp.material->n[L_R]),
-			hp.material->ks[L_G] == 0 ? 0 : hp.material->ks[L_G] * pow(cosphi, hp.material->n[L_G]),
-			hp.material->ks[L_B] == 0 ? 0 : hp.material->ks[L_B] * pow(cosphi, hp.material->n[L_B])
-			)) * (cos_dir_normal * cos_dir_lnormal / (lp.probability * l * l));
-	}
-
-	result /= SHADOW_RAYS;
-
-
-
-
-
-	GO_FLOAT qd = (hp.material->rd[L_R] + hp.material->rd[L_G] + hp.material->rd[L_B]) / 3;
-	GO_FLOAT qs = (hp.material->ks[L_R] + hp.material->ks[L_G] + hp.material->ks[L_B]) / 3;
-
-	if(qd + qs + MIN_ABSOPTION > 1)
-	{
-		GO_FLOAT k = (1 - MIN_ABSOPTION) / (qd + qs);
-		qd *= k;
-		qs *= k; 
-	}
-
-	GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
-
-	if(ksi < qd)
-	{
-		GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
-		GO_FLOAT sina = sqrt(1 - cosa * cosa);
-		GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
-
-		Vector ndirection = Transform(hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
-
-		const HitPoint* nhp = scene->Intersection(point, ndirection);
-
-		if(nhp)
+		if(ksi < qd)
 		{
-			const Vector npoint(point + ndirection * nhp->t);
+			GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
+			GO_FLOAT sina = sqrt(1 - cosa * cosa);
+			GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
 
-			result += Luminance(hp.material->rd) * L(*nhp, npoint, ndirection, scene, lights) / qd;
+			Vector ndirection = Transform(current_hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
+
+			const HitPoint* nhp = scene->Intersection(current_point, ndirection);
+
+			if(!nhp)
+			{
+				break;
+			}
+
+			const Vector npoint(current_point + ndirection * nhp->t);
+
+			factor *= Luminance(current_hp.material->rd) / qd;
 
 			delete nhp;
 		}
-	}
-	else if(ksi - qd < qs)
-	{
-		GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
-		GO_FLOAT sina = sqrt(1 - cosa * cosa);
-		GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
-
-		Vector ndirection = Transform(hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
-
-		const HitPoint* nhp = scene->Intersection(point, ndirection);
-
-		if(nhp)
+		else if(ksi - qd < qs)
 		{
-			const Vector npoint(point + ndirection * nhp->t);
+			GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
+			GO_FLOAT sina = sqrt(1 - cosa * cosa);
+			GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
 
-			const GO_FLOAT cosphi = hp.normal.DotProduct((ndirection - direction).Normalize());
-			
-			result += L(*nhp, npoint, ndirection, scene, lights) *
-				Luminance(
-					hp.material->ks[L_R] == 0 ? 0 : hp.material->ks[L_R] * pow(cosphi, hp.material->n[L_R]),
-					hp.material->ks[L_G] == 0 ? 0 : hp.material->ks[L_G] * pow(cosphi, hp.material->n[L_G]),
-					hp.material->ks[L_B] == 0 ? 0 : hp.material->ks[L_B] * pow(cosphi, hp.material->n[L_B])
-					) * (M_PI / qs);
+			Vector ndirection = Transform(current_hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
+
+			const HitPoint* nhp = scene->Intersection(current_point, ndirection);
+
+			if(!nhp)
+			{
+				break;
+			}
+
+			const Vector npoint(current_point + ndirection * nhp->t);
+
+			const GO_FLOAT cosphi = current_hp.normal.DotProduct((ndirection - current_direction).Normalize());
+
+			factor *= Luminance(
+				current_hp.material->ks[L_R] == 0 ? 0 : current_hp.material->ks[L_R] * pow(cosphi, current_hp.material->n[L_R]),
+				current_hp.material->ks[L_G] == 0 ? 0 : current_hp.material->ks[L_G] * pow(cosphi, current_hp.material->n[L_G]),
+				current_hp.material->ks[L_B] == 0 ? 0 : current_hp.material->ks[L_B] * pow(cosphi, current_hp.material->n[L_B])
+				) * (M_PI / (2 * qs));
 
 			delete nhp;
+		}
+		else
+		{
+			break;
 		}
 	}
 
