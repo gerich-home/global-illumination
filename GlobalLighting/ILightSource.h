@@ -1,17 +1,17 @@
 #pragma once
 
 #include "LightPoint.h"
-#include "HitPoint.h"
+#include "Vector.h"
 
 namespace Engine
 {
 	class LightPoint;
-	class HitPoint;
+	class Vector;
 
 	class ILightSource
 	{
 	public:
-		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint) const = 0;
+		virtual const LightPoint SampleLightPoint(const Vector& point) const = 0;
 	};
 }
 

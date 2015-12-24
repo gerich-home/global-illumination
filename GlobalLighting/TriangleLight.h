@@ -11,7 +11,7 @@ namespace Lights
 	public:
 		Triangle(const Vector a, const Vector b, const Vector c, const Luminance& Le);
 
-		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint) const;
+		virtual const LightPoint SampleLightPoint(const Vector& point) const;
 
 	private:
 		const GO_FLOAT probability;

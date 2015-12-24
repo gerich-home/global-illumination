@@ -20,7 +20,7 @@ Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, con
 
 		for(int i = 0; i < SHADOW_RAYS; i++)
 		{	
-			const LightPoint& lp = lights.SampleLightPoint(current_hp);
+			const LightPoint& lp = lights.SampleLightPoint(current_point);
 			Vector ndirection = lp.point - current_point;
 
 			GO_FLOAT cos_dir_normal = current_hp.normal.DotProduct(ndirection);
@@ -67,7 +67,7 @@ Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, con
 		direct /= SHADOW_RAYS;
 		
 		result += factor * direct;
-		
+		//break;
 		//Compute indirect luminancy
 		
 		const RandomDirection rndd = current_hp.material->SampleDirection(current_direction, current_point, current_hp.normal, scene, ABSOPTION);

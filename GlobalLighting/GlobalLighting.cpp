@@ -19,6 +19,7 @@
 #include "CompositeLightSource.h"
 
 #include "DiffuseSpecularMaterial.h"
+#include "IdealMirrorMaterial.h"
 
 #include <time.h>
 
@@ -173,13 +174,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	GO_FLOAT kd3[] = {0, 0, 0};
 	GO_FLOAT ks3[] = {1, 1, 1};
 	int      n3[]  = {1000, 1000, 1000};
-	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
+	const IMaterial* m3 = new Materials::IdealMirrorMaterial(ks3);
 	
-	GO_FLOAT Le1[] = {20, 20, 20};
+	GO_FLOAT Le1[] = {10, 10, 10};
 	
 	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1),  Vector(-0.5, -0.5, 10), Vector(0.5,  -0.5, 1),  m1);
 	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(0.5,   0.5, 1),  Vector(-0.5,  0.5, 10), m1);
-	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10),  Vector(0.5,  -0.5, 10), m1);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10),  Vector(0.5,  -0.5, 10), m3);
 	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(-0.5, 0.5, 10),  Vector(-0.5, -0.5, 1),  m1);
 	const IShape* rightWall = new Shapes::Square(Vector(0.5,  0.5, 1),   Vector(0.5, -0.5, 1),   Vector(0.5, 0.5, 10),   m1);
 		
@@ -196,7 +197,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 		ball1,
 		ball2,
-		ball3,
+		//ball3,
 	};
 	
 	const IShape* glossyShapes[] = {
@@ -225,7 +226,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	
 	const ILightSource* lightSources[] = {
 		new Lights::Square(Vector(-0.15, 0.45, 3.35), Vector(0.15,  0.45, 3.35), Vector(-0.15, 0.45, 3.65), Luminance(Le1)),
-		new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
+	//	new Lights::Square(Vector(-0.15, 0.45, 8.35), Vector(0.15,  0.45, 8.35), Vector(-0.15, 0.45, 8.65), Luminance(Le1)),
 		//new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
 		//new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
 	};

@@ -81,6 +81,7 @@
     <ClInclude Include="CompositeLightSource.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="GlobalPhotonMapBuilder.h" />
+    <ClInclude Include="IdealMirrorMaterial.h" />
     <ClInclude Include="IEngine.h" />
     <ClInclude Include="GlobalLighting.h" />
     <ClInclude Include="HitPoint.h" />

@@ -13,7 +13,7 @@ Lights::Triangle::Triangle(const Vector a, const Vector b, const Vector c, const
 {
 }
 
-const LightPoint Lights::Triangle::SampleLightPoint(const HitPoint& hitPoint) const
+const LightPoint Lights::Triangle::SampleLightPoint(const Vector& point) const
 {
 	GO_FLOAT t1 = (GO_FLOAT) rand() / RAND_MAX;
 	GO_FLOAT t2 = (GO_FLOAT) rand() / RAND_MAX;
@@ -24,5 +24,6 @@ const LightPoint Lights::Triangle::SampleLightPoint(const HitPoint& hitPoint) co
 		t2 = 1 - t2;
 	}
 
-	return LightPoint(a + t1 * ba + t2 * ca, normal, probability, Le);
+	Vector p = a + t1 * ba + t2 * ca;
+	return LightPoint(p, (point - p).Normalize(), probability, Le);
 }
