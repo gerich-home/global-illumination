@@ -151,22 +151,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	}
 
 
-	GO_FLOAT kd1[] = {0, 0, 0};
-	GO_FLOAT ks1[] = {1, 1, 1};
-	int      n1[]  = {15, 15, 15};
+	GO_FLOAT kd1[] = {0, 1, 0};
+	GO_FLOAT ks1[] = {1, 0, 1};
+	int      n1[]  = {5, 10, 15};
 	const Material* m1 = new Material(kd1, ks1, n1);
 
-	GO_FLOAT kd2[] = {0, 0, 0};
-	GO_FLOAT ks2[] = {0, 0, 0};
-	int      n2[]  = {0, 0, 0};
+	GO_FLOAT kd2[] = {0.5, 0.5, 0};
+	GO_FLOAT ks2[] = {0.5, 0, 0.3};
+	int      n2[]  = {10, 0, 40};
 	const Material* m2 = new Material(kd2, ks2, n2);
 	
-	GO_FLOAT kd3[] = {0.8, 0.8, 0.8};
-	GO_FLOAT ks3[] = {0, 0, 0};
-	int      n3[]  = {0, 0, 0};
+	GO_FLOAT kd3[] = {0, 0, 0};
+	GO_FLOAT ks3[] = {1, 1, 1};
+	int      n3[]  = {10, 10, 10};
 	const Material* m3 = new Material(kd3, ks3, n3);
 	
-	GO_FLOAT Le1[] = {10, 10, 10};
+	GO_FLOAT Le1[] = {5, 5, 5};
 
 	const IShape* shapes[] = {
 
@@ -177,17 +177,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		//back wall
 		new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), m3),
 		//left wall
-		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), m3),
+		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), m2),
 		//right wall
-		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), m3),
+		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), m1),
 		
-		new Shapes::Sphere(Vector(0, -0.4, 1.5), 0.1, m1),
-		new Shapes::Sphere(Vector(0.25, 0.2, 1.7), 0.1, m1),
+		new Shapes::Sphere(Vector(0, -0.4, 1.5), 0.1, m3),
+		new Shapes::Sphere(Vector(0.25, 0.2, 1.7), 0.1, m2),
+		new Shapes::Sphere(Vector(-0.3, 0.2, 1.7), 0.05, m1),
 	};
 	
 	const ILightSource* lightSources[] = {
 		//new Lights::Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), Luminance(Le1)),
 		new Lights::Sphere(Vector(0, 0.5, 1.5), 0.1, Luminance(Le1)),
+		new Lights::Sphere(Vector(-0.3, -0.3, 1.5), 0.05, Luminance(Le1)),
 	};
 	
 	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);

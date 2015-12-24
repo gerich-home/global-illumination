@@ -6,106 +6,36 @@
 #include <math.h>
 
 using namespace Engine;
-#define N 10
-#define SHADOW_RAYS 10
-#define MAX_DEEP 4
+#define SHADOW_RAYS 3
+#define MIN_ABSOPTION 0.01
 
 SimpleTracing::SimpleTracing(void)
 {
 	srand(time(0));
-	currentDeep = 0;
 }
 
 SimpleTracing::~SimpleTracing(void)
 {
 }
 
-GO_FLOAT SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights, int colorIndex)
+Luminance SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights)
 {
-	GO_FLOAT direct = 0;
-	GO_FLOAT indirect = 0;
+	Luminance result;
 
-	GO_FLOAT cos_dir_normal = -hp.normal.DotProduct(direction);
-
-	currentDeep++;
-
-	if(currentDeep < MAX_DEEP)
-	{
-		for(int i = 0; i < N; i++)
-		{
-			GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
-			
-			GO_FLOAT ax;
-			GO_FLOAT ay;
-			GO_FLOAT az;
-
-			GO_FLOAT factor;
-			Vector ndirection;
-
-			if(ksi < hp.material->rd[colorIndex])
-			{
-				GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
-				GO_FLOAT sina = sqrt(1 - cosa * cosa);
-				GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
-
-				ax = sina * cos(b);
-				ay = sina * sin(b);
-				az = cosa;
-								
-				ndirection = Transform(hp.normal, Vector(ax, ay, az));
-
-				const HitPoint* nhp = scene->Intersection(point, ndirection);
-
-				if(!nhp)
-				{
-					continue;
-				}
-
-				const Vector npoint(point + ndirection * nhp->t);
-
-				indirect += 2 * L(*nhp, npoint, ndirection, scene, lights, colorIndex);
-				
-				delete nhp;
-			}
-			else if(ksi - hp.material->rd[colorIndex] < 2 * M_PI * hp.material->ks[colorIndex] / (hp.material->n[colorIndex] + 2))
-			{
-				GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
-				GO_FLOAT sina = sqrt(1 - cosa * cosa);
-				GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
-
-				ax = sina * cos(b);
-				ay = sina * sin(b);
-				az = cosa;
-
-				ndirection = Transform(hp.normal, Vector(ax, ay, az));
-
-				const HitPoint* nhp = scene->Intersection(point, ndirection);
-
-				if(!nhp)
-				{
-					continue;
-				}
-
-				const Vector npoint(point + ndirection * nhp->t);
-
-				indirect += (hp.material->n[colorIndex] + 2) * pow(hp.normal.DotProduct((ndirection - direction).Normalize()), hp.material->n[colorIndex]) * L(*nhp, npoint, ndirection, scene, lights, colorIndex);
-				
-				delete nhp;
-			}
-		}
-
-
-		indirect /= N;
-	}
-
-	
 	for(int i = 0; i < SHADOW_RAYS; i++)
 	{
-		const LightPoint& lp = lights->SampleLightPoint(hp, colorIndex);
+		const LightPoint& lp = lights->SampleLightPoint(hp);
 		Vector ndirection = lp.point - point;
+		
+		GO_FLOAT cos_dir_normal = hp.normal.DotProduct(ndirection);
+		
+		if(cos_dir_normal < 0)
+		{
+			continue;
+		}
 
-		GO_FLOAT cos_dir_lnormal = ndirection.DotProduct(lp.normal);
-		if(cos_dir_lnormal > 0)
+		GO_FLOAT cos_dir_lnormal = -(ndirection.DotProduct(lp.normal));
+		if(cos_dir_lnormal < 0)
 		{
 			continue;
 		}
@@ -115,8 +45,11 @@ GO_FLOAT SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector&
 		{
 			continue;
 		}
-		ndirection /= l;
-		cos_dir_lnormal /= l;
+
+		GO_FLOAT factor = 1 / l;
+		ndirection *= factor;
+		cos_dir_normal *= factor;
+		cos_dir_lnormal *= factor;
 
 		const HitPoint* nhp = scene->Intersection(point, ndirection);
 
@@ -133,20 +66,80 @@ GO_FLOAT SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector&
 			}
 		}
 
-		GO_FLOAT brdf = hp.material->rd[colorIndex] / M_PI;
-		if(hp.material->ks[colorIndex] > 0)
-		{
-			brdf += hp.material->ks[colorIndex] * pow(hp.normal.DotProduct((ndirection - direction).Normalize()), hp.material->n[colorIndex]);
-		}
+		const GO_FLOAT cosphi = hp.normal.DotProduct((ndirection - direction).Normalize());
 
-		direct -= lp.Le * brdf * cos_dir_normal * cos_dir_lnormal / (lp.probability * l * l);
-				
+		result += lp.Le * (Luminance(hp.material->rd) / M_PI + Luminance(
+			hp.material->ks[L_R] == 0 ? 0 : hp.material->ks[L_R] * pow(cosphi, hp.material->n[L_R]),
+			hp.material->ks[L_G] == 0 ? 0 : hp.material->ks[L_G] * pow(cosphi, hp.material->n[L_G]),
+			hp.material->ks[L_B] == 0 ? 0 : hp.material->ks[L_B] * pow(cosphi, hp.material->n[L_B])
+			)) * (cos_dir_normal * cos_dir_lnormal / (lp.probability * l * l));
 	}
 
-	direct /= SHADOW_RAYS;
+	result /= SHADOW_RAYS;
 
-	currentDeep--;
-	return direct + indirect;
+
+
+
+
+	GO_FLOAT qd = (hp.material->rd[L_R] + hp.material->rd[L_G] + hp.material->rd[L_B]) / 3;
+	GO_FLOAT qs = (hp.material->ks[L_R] + hp.material->ks[L_G] + hp.material->ks[L_B]) / 3;
+
+	if(qd + qs + MIN_ABSOPTION > 1)
+	{
+		GO_FLOAT k = (1 - MIN_ABSOPTION) / (qd + qs);
+		qd *= k;
+		qs *= k; 
+	}
+
+	GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
+
+	if(ksi < qd)
+	{
+		GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
+		GO_FLOAT sina = sqrt(1 - cosa * cosa);
+		GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
+
+		Vector ndirection = Transform(hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
+
+		const HitPoint* nhp = scene->Intersection(point, ndirection);
+
+		if(nhp)
+		{
+			const Vector npoint(point + ndirection * nhp->t);
+
+			result += Luminance(hp.material->rd) * L(*nhp, npoint, ndirection, scene, lights) / qd;
+
+			delete nhp;
+		}
+	}
+	else if(ksi - qd < qs)
+	{
+		GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
+		GO_FLOAT sina = sqrt(1 - cosa * cosa);
+		GO_FLOAT b = 2 * M_PI * (GO_FLOAT) rand() / RAND_MAX;
+
+		Vector ndirection = Transform(hp.normal, Vector(sina * cos(b), sina * sin(b), cosa));
+
+		const HitPoint* nhp = scene->Intersection(point, ndirection);
+
+		if(nhp)
+		{
+			const Vector npoint(point + ndirection * nhp->t);
+
+			const GO_FLOAT cosphi = hp.normal.DotProduct((ndirection - direction).Normalize());
+			
+			result += L(*nhp, npoint, ndirection, scene, lights) *
+				Luminance(
+					hp.material->ks[L_R] == 0 ? 0 : hp.material->ks[L_R] * pow(cosphi, hp.material->n[L_R]),
+					hp.material->ks[L_G] == 0 ? 0 : hp.material->ks[L_G] * pow(cosphi, hp.material->n[L_G]),
+					hp.material->ks[L_B] == 0 ? 0 : hp.material->ks[L_B] * pow(cosphi, hp.material->n[L_B])
+					) * (M_PI / qs);
+
+			delete nhp;
+		}
+	}
+
+	return result;
 }
 
 Vector SimpleTracing::Transform(const Vector& axis, const Vector& direction) const

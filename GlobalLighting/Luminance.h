@@ -25,7 +25,7 @@ namespace Engine
 			colors[L_B] = b;
 		}
 
-		Luminance(GO_FLOAT colors[])
+		Luminance(const GO_FLOAT * colors)
 		{
 			this->colors[L_R] = colors[L_R];
 			this->colors[L_G] = colors[L_G];
@@ -73,6 +73,11 @@ namespace Engine
 			return *this;
 		}
 	
+		Luminance operator *(const Luminance& l) const
+		{
+			return Luminance(l.colors[L_R] * colors[L_R], l.colors[L_G] * colors[L_G], l.colors[L_B] * colors[L_B]);
+		}
+	
 		Luminance operator *(GO_FLOAT alpha) const
 		{
 			return Luminance(alpha * colors[L_R], alpha * colors[L_G], alpha * colors[L_B]);
@@ -93,4 +98,9 @@ namespace Engine
 	
 		GO_FLOAT colors[3];
 	};
+
+	inline Luminance operator *(GO_FLOAT alpha, const Luminance& l)
+	{
+		return Luminance(alpha * l.colors[L_R], alpha * l.colors[L_G], alpha * l.colors[L_B]);
+	}
 }

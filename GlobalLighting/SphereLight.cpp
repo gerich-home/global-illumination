@@ -14,7 +14,7 @@ Lights::Sphere::Sphere(const Vector& center, GO_FLOAT r, const Luminance& Le) :
 {
 }
 
-const LightPoint Lights::Sphere::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
+const LightPoint Lights::Sphere::SampleLightPoint(const HitPoint& hitPoint) const
 {	
 	GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
 	GO_FLOAT sina = sqrt(1 - cosa * cosa);
@@ -22,5 +22,5 @@ const LightPoint Lights::Sphere::SampleLightPoint(const HitPoint& hitPoint, int 
 
 	const Vector normal = Vector(cosa * cos(b), cosa * sin(b), sina);
 
-	return LightPoint(center + r * normal, normal, probability, Le.colors[colorIndex]);
+	return LightPoint(center + r * normal, normal, probability, Le);
 }

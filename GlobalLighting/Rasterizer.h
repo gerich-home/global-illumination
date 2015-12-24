@@ -19,12 +19,11 @@ namespace Engine
 		}
 
 		const Vector point(start + direction * hp->t);
-		GO_FLOAT r = engine->L(*hp, point, direction, scene, lights, L_R);
-		GO_FLOAT g = engine->L(*hp, point, direction, scene, lights, L_G);
-		GO_FLOAT b = engine->L(*hp, point, direction, scene, lights, L_B);
+
+		const Luminance& l = engine->L(*hp, point, direction, scene, lights);
 	
 		delete hp;
 
-		return Luminance(r, g, b);
+		return l;
 	}
 }

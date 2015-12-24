@@ -11,7 +11,7 @@ namespace Lights
 	public:
 		Sphere(const Vector& center, GO_FLOAT r, const Luminance& Le);
 
-		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const;
+		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint) const;
 
 	private:
 		const GO_FLOAT r;

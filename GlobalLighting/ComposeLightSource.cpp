@@ -46,7 +46,7 @@ Lights::CompositeLightSource::~CompositeLightSource()
 	delete[] probabilities;
 }
 
-const LightPoint Lights::CompositeLightSource::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
+const LightPoint Lights::CompositeLightSource::SampleLightPoint(const HitPoint& hitPoint) const
 {
 	GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
 
@@ -54,7 +54,7 @@ const LightPoint Lights::CompositeLightSource::SampleLightPoint(const HitPoint& 
 	{
 		if(ksi < probabilities[i])
 		{
-			const LightPoint& lp = lights[i]->SampleLightPoint(hitPoint, colorIndex);
+			const LightPoint& lp = lights[i]->SampleLightPoint(hitPoint);
 			return LightPoint(lp.point, lp.normal, probabilities[i] * lp.probability, lp.Le);
 		}
 		else

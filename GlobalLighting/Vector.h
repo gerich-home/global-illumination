@@ -53,6 +53,11 @@ namespace Engine
 			return *this;
 		}
 
+		Vector operator -() const
+		{
+			return Vector(-x, -y, -z);
+		}
+
 		Vector operator -(const Vector& vector) const
 		{
 			return Vector(x - vector.x, y - vector.y, z - vector.z);

@@ -9,10 +9,9 @@ namespace Engine
 	public:
 		SimpleTracing();
 		~SimpleTracing();
-		virtual GO_FLOAT L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights, int colorIndex);
+		virtual Luminance L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights);
 		
 	private:
 		Vector Transform(const Vector& axis, const Vector& direction) const;
-		int currentDeep;
 	};
 }

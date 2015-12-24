@@ -2,13 +2,14 @@
 
 #include "Defines.h"
 #include "Vector.h"
+#include "Luminance.h"
 
 namespace Engine
 {
 	class LightPoint
 	{
 	public:
-		LightPoint(const Vector& point, const Vector& normal, GO_FLOAT probability, GO_FLOAT Le) :
+		LightPoint(const Vector& point, const Vector& normal, GO_FLOAT probability, const Luminance& Le) :
 			point(point),
 			normal(normal),
 			probability(probability),
@@ -19,6 +20,6 @@ namespace Engine
 		const Vector point;
 		const Vector normal;
 		const GO_FLOAT probability;
-		const GO_FLOAT Le;
+		const Luminance Le;
 	};
 }

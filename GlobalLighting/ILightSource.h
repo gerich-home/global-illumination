@@ -8,7 +8,7 @@ namespace Engine
 	class ILightSource
 	{
 	public:
-		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const = 0;
+		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint) const = 0;
 	};
 }
 

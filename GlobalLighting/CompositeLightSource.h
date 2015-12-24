@@ -13,7 +13,7 @@ namespace Lights
 		CompositeLightSource(int nlights, const ILightSource* lights[], GO_FLOAT probabilities[]);
 		~CompositeLightSource();
 
-		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const;
+		virtual const LightPoint SampleLightPoint(const HitPoint& hitPoint) const;
 
 	private:
 		const ILightSource** lights;
