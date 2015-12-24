@@ -100,7 +100,7 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Square.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Заголовочные файлы\GeometryObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,10 +125,10 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Файлы исходного кода\GeometryObjects</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryManager.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="Square.cpp">
+      <Filter>Файлы исходного кода\GeometryObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManager.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,25 +1,23 @@
 #include "stdafx.h"
 #include "stdio.h"
 #include "MemoryManager.h"
-//#include "Utils.h"
 
 #undef new
 
 const char* __file__ = "";
 size_t __line__ = 0;
 
-//CCriticalSection *Mutex;
-//bool mutexInited = false;
+CRITICAL_SECTION cs;
+bool csInited = false;
 
-/*void InitMutex()
+void InitMutex()
 {
-	if(!mutexInited)
+	if(!csInited)
 	{
-		Mutex = (CCriticalSection*)malloc(sizeof(CCriticalSection));
-		new(Mutex) CCriticalSection();
-		mutexInited = true;
+		InitializeCriticalSection(&cs);
+		csInited = true;
 	}
-}*/
+}
 
 struct memoryRecord
 {
@@ -79,8 +77,9 @@ void PrintMemoryUsage()
 
 void* __taluMalloc(size_t size, const char * file, size_t line)
 {
-	//InitMutex();
-    //CSyncObjectLock locker(*Mutex);
+	InitMutex();
+    
+	EnterCriticalSection(&cs);
 
 	memoryRecord* newItem =(memoryRecord*)malloc(sizeof(memoryRecord));
 	newItem->size = size;
@@ -92,13 +91,16 @@ void* __taluMalloc(size_t size, const char * file, size_t line)
 
 	memoryusage += size; 
 	
+	LeaveCriticalSection(&cs);
+
 	return newItem->ptr;
 }
 
 void __taluFree(void* ptr)
 {
-	//InitMutex();
-	//CSyncObjectLock locker(*Mutex);
+	InitMutex();
+	EnterCriticalSection(&cs);
+
 	memoryRecord* current = memoryList.next;
 	memoryRecord* prev = &memoryList;
 
@@ -114,14 +116,17 @@ void __taluFree(void* ptr)
 		prev = current;
 		current = current->next;
 	}
+	
+	LeaveCriticalSection(&cs);
 
 	free(ptr);
 }
 
 void* __taluRealloc(void* ptr, size_t newsize, const char * file, size_t line)
 {
-	//InitMutex();
-	//CSyncObjectLock locker(*Mutex);
+	InitMutex();
+	EnterCriticalSection(&cs);
+
 	if(newsize == 0)
 	{
 		__taluFree(ptr);
@@ -146,6 +151,8 @@ void* __taluRealloc(void* ptr, size_t newsize, const char * file, size_t line)
 		}
 		current = current->next;
 	}
+	
+	LeaveCriticalSection(&cs);
 
 	return current->ptr;
 }

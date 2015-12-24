@@ -28,7 +28,12 @@ const HitPoint* Scene::Intersection(const Vector& start, const Vector& direction
 		hitPoint = shapes[i]->Intersection(start, direction);
 		if(hitPoint != NULL && (bestHitPoint ? hitPoint->t < bestHitPoint->t : TRUE))
 		{
+			delete bestHitPoint;
 			bestHitPoint = hitPoint;
+		}
+		else
+		{
+			delete hitPoint;
 		}
 	}
 

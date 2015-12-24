@@ -2,7 +2,7 @@
 #include "Square.h"
 
 
-Square::Square(const Vector a, const Vector b, const Vector c):
+Square::Square(const Vector a, const Vector b, const Vector c, const Material* material):
 	a(a),
 	ba(b - a),
 	ca(c - a),
@@ -16,7 +16,7 @@ Square::~Square(void)
 {
 }
 
-const HitPoint* Square::Intersection(const Vector& start, const Vector& direction)
+const HitPoint* Square::Intersection(const Vector& start, const Vector& direction) const
 {
 	GO_FLOAT t = 0;
 	GO_FLOAT t1 = 0;

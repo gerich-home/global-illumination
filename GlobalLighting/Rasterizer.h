@@ -10,7 +10,7 @@ Luminance ColorAtPixel(GO_FLOAT px, GO_FLOAT py, int width, int height, GO_FLOAT
 	const Vector start(lx, ly, 0);
 	const Vector direction(Vector(lx, ly, cam).Normalize());
 	const HitPoint* hp = scene->Intersection(start, direction);
-
+	
 	if(!hp)
 	{
 		return Luminance(0, 0, 0);

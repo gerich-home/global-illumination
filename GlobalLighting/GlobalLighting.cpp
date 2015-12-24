@@ -9,14 +9,31 @@
 #include "SimpleTracing.h"
 #include "Rasterizer.h"
 #include "Scene.h"
+#include "Square.h"
 #include <time.h>
 
-//#include "MemoryManager.h"
+IShape* scene;
+
+#define W 640
+#define H 480
+#define WORKERS 4
+
+Luminance L[W * H];
+
+DWORD ThreadProc(LPVOID lpdwThreadParam);
+CRITICAL_SECTION CriticalSection;
+bool destroyed = false;
+volatile int currentLine;
+bool busy[H];
+int frame[H];
+
+#include "MemoryManager.h"
 
 #define MAX_LOADSTRING 100
 
 // √лобальные переменные:
 HINSTANCE hInst;								// текущий экземпл€р
+volatile HWND hWnd;
 TCHAR szTitle[MAX_LOADSTRING];					// “екст строки заголовка
 TCHAR szWindowClass[MAX_LOADSTRING];			// им€ класса главного окна
 
@@ -25,13 +42,6 @@ ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
-
-IShape* scene;
-IEngine* engine;
-
-#define W 640
-#define H 480
-#define NRAYS 50
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -119,8 +129,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-	HWND hWnd;
-
 	hInst = hInstance; // —охранить дескриптор экземпл€ра в глобальной переменной
 
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
@@ -149,18 +157,26 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	const IShape* shapes[] = {
 		//new Triangle(Vector(0, 0, 2), Vector(0, 1, 1), Vector(1, 0, 1), new Material(kd3, ks3, Le3, n3)),
-		new Sphere(Vector(0, 0, 3), 1, new Material(kd1, ks1, Le1, n1)),
+		new Square(Vector(-0.5, -0.5, 1),    Vector(-0.5, -0.5, 2),    Vector(0.5,  -0.5, 1),    new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(-0.5,  0.5, 1),    Vector(0.5,   0.5, 1),    Vector(-0.5,  0.5, 2),    new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), new Material(kd2, ks2, Le2, n2)),
+		/*new Sphere(Vector(0, 0, 3), 1, new Material(kd1, ks1, Le1, n1)),
 		new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, Le1, n1)),
 		new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, Le1, n1)),
-		new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, Le3, n3)),
-		new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, Le2, n2)),
+		new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, Le3, n3)),*/
+		//new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, Le2, n2)),
 		//new Sphere(Vector(-6, 0, -12), 1, new Material(kd2, ks2, Le2, n2))
 	};
 
 	scene = new Scene(sizeof(shapes) / sizeof(IShape*), shapes);
-	engine = new SimpleTracing();
+	
+	InitializeCriticalSection(&CriticalSection);
 
-
+	for(int i = 0; i< WORKERS; i++)
+	{
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ThreadProc, 0, 0, 0);
+	}
+	
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -182,6 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	RECT r;
 
 	switch (message)
 	{
@@ -202,38 +219,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-
-		srand(time(0));
-		//PrintMemoryTable();
-		for(int j = 0; j < H; j++)
+		if(GetUpdateRect(hWnd, &r, false))
 		{
-			for(int i = 0; i < W; i++)
+			hdc = BeginPaint(hWnd, &ps);
+
+			srand(time(0));
+			for(int j = r.top; j <= r.bottom; j++)
 			{
-
-				Luminance l = Luminance(0, 0, 0);
-
-				for(int k = 0; k < NRAYS; k++)
+				for(int i = 0; i < W; i++)
 				{
-					l += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 3, scene, engine);
+					Luminance l = L[i * H + j] / frame[j];
+					SetPixel(hdc, i, j, RGB(l.r > 1 ? 255 : l.r * 255,
+											l.g > 1 ? 255 : l.g * 255,
+											l.b > 1 ? 255 : l.b * 255
+											));
 				}
-
-				l /= NRAYS;
-
-				SetPixel(hdc, i, j, RGB(l.r > 1 ? 255 : l.r * 255,
-										l.g > 1 ? 255 : l.g * 255,
-										l.b > 1 ? 255 : l.b * 255
+				SetPixel(hdc, 100, j, RGB(frame[j],
+										frame[j],
+										frame[j]
 										));
 			}
-			/*if(i % 60)
-			{
-			PrintMemoryTable();
-			}*/
+
+			EndPaint(hWnd, &ps);
 		}
 
-		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
+		PrintMemoryTable();
 		PostQuitMessage(0);
 		break;
 	default:
@@ -260,4 +272,54 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+
+
+DWORD ThreadProc(LPVOID lpdwThreadParam)
+{
+
+	IEngine* engine = new SimpleTracing();
+
+	int j = -1;
+
+	while(!destroyed)
+	{
+		EnterCriticalSection(&CriticalSection);
+		
+		if(j >= 0)
+		{
+			busy[j] = false;
+			frame[j]++;
+		}
+
+		while(busy[currentLine])
+		{	
+			currentLine++;
+
+			if(currentLine == H)
+			{
+				currentLine = 0;
+			}
+		}
+
+		j = currentLine;
+		busy[j] = true;
+
+		LeaveCriticalSection(&CriticalSection);
+
+		for(int i = 0; i < W && !destroyed; i++)
+		{
+			L[i * H + j] += ColorAtPixel(i + (float)rand() / RAND_MAX - 0.5, j + (float)rand() / RAND_MAX - 0.5, W, H, 3, scene, engine);
+		}
+
+		RECT r;
+		r.left   = 0;
+		r.top    = j;
+		r.right  = W;
+		r.bottom = j + 1;
+		InvalidateRect(hWnd, &r, false);
+	}
+
+	return 0;
 }

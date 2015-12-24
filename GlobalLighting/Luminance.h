@@ -7,6 +7,14 @@
 class Luminance
 {
 public:
+	Luminance(): 
+		r(0),
+		g(0),
+		b(0)
+	{
+
+	}
+
 	Luminance(GO_FLOAT r, GO_FLOAT g, GO_FLOAT b): 
 		r(r),
 		g(g),
@@ -28,12 +36,31 @@ public:
 		return *this;
 	}
 	
+	Luminance operator /(GO_FLOAT alpha) const
+	{
+		GO_FLOAT factor = 1 / alpha;
+		return Luminance(factor * r, factor * g, factor * b);
+	}
+	
 	Luminance& operator /=(GO_FLOAT alpha)
 	{
 		GO_FLOAT factor = 1 / alpha;
 		r *= factor;
 		g *= factor;
 		b *= factor;
+		return *this;
+	}
+	
+	Luminance operator *(GO_FLOAT alpha) const
+	{
+		return Luminance(alpha * r, alpha * g, alpha * b);
+	}
+	
+	Luminance& operator *=(GO_FLOAT alpha)
+	{
+		r *= alpha;
+		g *= alpha;
+		b *= alpha;
 		return *this;
 	}
 		

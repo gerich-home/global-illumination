@@ -2,19 +2,20 @@
 #include "Vector.h"
 #include "IShape.h"
 
-class Square: IShape
+class Square: public IShape
 {
 public:
-	Square(const Vector a, const Vector b, const Vector c);
+	Square(const Vector a, const Vector b, const Vector c, const Material* material);
 	~Square(void);
-	virtual const HitPoint* Intersection(const Vector& start, const Vector& direction);
+
+	virtual const HitPoint* Intersection(const Vector& start, const Vector& direction) const;
 
 private:
-	Vector a;
-	Vector ba;
-	Vector ca;
+	const Vector a;
+	const Vector ba;
+	const Vector ca;
 	Vector normal;
 	Vector n;
-	Material* material;
+	const Material* material;
 };
 

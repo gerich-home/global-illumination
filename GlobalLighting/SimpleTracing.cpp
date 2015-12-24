@@ -7,7 +7,7 @@
 
 
 #define N 40
-#define MAX_DEEP 5
+#define MAX_DEEP 4
 
 SimpleTracing::SimpleTracing(void)
 {
@@ -86,12 +86,11 @@ GO_FLOAT SimpleTracing::L(const HitPoint* hp, const Vector& point, const Vector&
 
 				const Vector npoint(point + ndirection * nhp->t);
 
-				result += 2 * hp->material->rd[colorIndex] * L(nhp, npoint, ndirection, shape, colorIndex);
+				result += 2 * L(nhp, npoint, ndirection, shape, colorIndex);
 				
 				delete nhp;
 			}
-
-			if(ksi < hp->material->ks[colorIndex])
+			else if(ksi - hp->material->rd[colorIndex] < 2 * M_PI * hp->material->ks[colorIndex] / (hp->material->n[colorIndex] + 2))
 			{
 				GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
 				GO_FLOAT sina = sqrt(1 - cosa * cosa);
@@ -139,7 +138,7 @@ GO_FLOAT SimpleTracing::L(const HitPoint* hp, const Vector& point, const Vector&
 
 				const Vector npoint(point + ndirection * nhp->t);
 
-				result += 2 * M_PI * hp->material->ks[colorIndex] * pow(hp->normal.DotProduct((ndirection - direction).Normalize()), hp->material->n[colorIndex]) * L(nhp, npoint, ndirection, shape, colorIndex);
+				result += (hp->material->n[colorIndex] + 2) * pow(hp->normal.DotProduct((ndirection - direction).Normalize()), hp->material->n[colorIndex]) * L(nhp, npoint, ndirection, shape, colorIndex);
 				
 				delete nhp;
 			}
