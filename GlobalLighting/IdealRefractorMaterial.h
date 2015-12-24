@@ -13,93 +13,149 @@ namespace Materials
 	class IdealRefractorMaterial: public IMaterial
 	{
 	public:
-		IdealRefractorMaterial(GO_FLOAT rreflect[], GO_FLOAT rrefract[], GO_FLOAT refract) :
-			rreflect(rreflect),
-			rrefract(rrefract),
+		IdealRefractorMaterial(GO_FLOAT rd[], GO_FLOAT refract) :
+			rd(rd),
 			refract(refract)
 		{
 		}
 
 		const Luminance BRDF(const Vector& direction, const Vector& ndirection, const Vector& normal) const
 		{
+			int n = 500;
+
 			GO_FLOAT cosa = -direction.DotProduct(normal);
-			
-			
-			GO_FLOAT cosb = 1 - (1 - cosa * cosa) * refract * refract;
+			GO_FLOAT factor = refract;
+			if(cosa < 0)
+			{
+				factor = 1 / factor;
+			}
+
+			GO_FLOAT cosb = 1 - (1 - cosa * cosa) * factor * factor;
+
 			if(cosb < 0)
-				return Luminance();
+			{
+				const Vector R = direction + 2 * cosa * normal;
+				
+				const GO_FLOAT cosphi = ndirection.DotProduct(R);
+			
+				if(cosphi > 0)
+				{
+					return Luminance(
+						rd.colors[L_R] == 0 ? 0 : rd.colors[L_R] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_G] == 0 ? 0 : rd.colors[L_G] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_B] == 0 ? 0 : rd.colors[L_B] * (n + 2) * pow(cosphi, n)
+						) / (2 * M_PI);	
+				}
+				else
+				{
+					return Luminance();
+				}
+			}
 
 			cosb = sqrt(cosb);
 
-			Vector R;
-			if(cosa > 0)
-			{
-				R = -cosb * normal + refract * (cosa * normal + direction);
-			}
-			else	
-			{
-				R = cosb * normal + refract * (cosa * normal + direction);
-			}
+			GO_FLOAT cosabs = abs(cosa);
+			GO_FLOAT Rs = (factor * cosabs - cosb) / (factor * cosabs  + cosb);
+			Rs *= Rs;
+
+			GO_FLOAT Rt = (factor * cosb - cosabs) / (factor * cosb + cosabs);
+			Rt *= Rt;
 			
-			const GO_FLOAT cosphi = ndirection.DotProduct(R);
-			int n = 1000;
+			GO_FLOAT qreflect = (Rs + Rt) / 2;
 			
-			if(cosphi > 0 )
+			Luminance result;
+			
 			{
-				return Luminance(
-					rrefract.colors[L_R] == 0 ? 0 : rrefract.colors[L_R] * (n + 2) * pow(cosphi, n),
-					rrefract.colors[L_G] == 0 ? 0 : rrefract.colors[L_G] * (n + 2) * pow(cosphi, n),
-					rrefract.colors[L_B] == 0 ? 0 : rrefract.colors[L_B] * (n + 2) * pow(cosphi, n)
-					) / (2 * M_PI);
+				const Vector R = direction + 2 * cosa * normal;
+				const GO_FLOAT cosphi = ndirection.DotProduct(R);
+			
+				if(cosphi > 0)
+				{
+					result = qreflect * Luminance(
+						rd.colors[L_R] == 0 ? 0 : rd.colors[L_R] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_G] == 0 ? 0 : rd.colors[L_G] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_B] == 0 ? 0 : rd.colors[L_B] * (n + 2) * pow(cosphi, n)
+						) / (2 * M_PI);
+				}
 			}
 
-			return Luminance();
+			{
+				Vector R;
+				if(cosa > 0)
+				{
+					R = -cosb * normal + factor * (cosa * normal + direction);
+				}
+				else	
+				{
+					R = cosb * normal + factor * (cosa * normal + direction);
+				}
+				
+				const GO_FLOAT cosphi = ndirection.DotProduct(R);
+			
+				if(cosphi > 0)
+				{
+					result = (1 - qreflect) * Luminance(
+						rd.colors[L_R] == 0 ? 0 : rd.colors[L_R] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_G] == 0 ? 0 : rd.colors[L_G] * (n + 2) * pow(cosphi, n),
+						rd.colors[L_B] == 0 ? 0 : rd.colors[L_B] * (n + 2) * pow(cosphi, n)
+						) / (2 * M_PI);
+				}
+			}
+
+			return result;
 		}
 
 		const RandomDirection SampleDirection(const Vector& direction, const Vector& normal, GO_FLOAT ksi) const
 		{	
-			GO_FLOAT qreflect = (rreflect.colors[L_R] + rreflect.colors[L_G] + rreflect.colors[L_B]) / 3;
-			GO_FLOAT qrefract = (rrefract.colors[L_R] + rrefract.colors[L_G] + rrefract.colors[L_B]) / 3;
-
-			if(qreflect + qrefract != 1)
-			{
-				GO_FLOAT k = 1 / (qreflect + qrefract);
-				qreflect *= k;
-				qrefract *= k;
-			}
-			
 			GO_FLOAT cosa = -direction.DotProduct(normal);
+			GO_FLOAT factor = refract;
+			if(cosa < 0)
+			{
+				factor = 1 / factor;
+			}
+
+			GO_FLOAT cosb = 1 - (1 - cosa * cosa) * factor * factor;
+
+			if(cosb < 0)
+			{
+				const Vector R = direction + 2 * cosa * normal;
+				return RandomDirection(rd, R);	
+			}
+
+			cosb = sqrt(cosb);
+
+			GO_FLOAT cosabs = abs(cosa);
+			GO_FLOAT Rs = (factor * cosabs - cosb) / (factor * cosabs  + cosb);
+			Rs *= Rs;
+
+			GO_FLOAT Rt = (factor * cosb - cosabs) / (factor * cosb + cosabs);
+			Rt *= Rt;
+			
+			GO_FLOAT qreflect = (Rs + Rt) / 2;
 			
 			if(ksi < qreflect)
 			{
 				const Vector R = direction + 2 * cosa * normal;
-				return RandomDirection(rreflect / qreflect, R);	
+				return RandomDirection(rd, R);	
 			}
 			else
 			{
-				GO_FLOAT cosb = 1 - (1 - cosa * cosa) * refract * refract;
-				if(cosb < 0)
-					return RandomDirection();
-
-				cosb = sqrt(cosb);
-
 				Vector R;
 				if(cosa > 0)
 				{
-					R = -cosb * normal + refract * (cosa * normal + direction);
+					R = -cosb * normal + factor * (cosa * normal + direction);
 				}
-				else	
+				else
 				{
-					R = cosb * normal + refract * (cosa * normal + direction);
+					R = cosb * normal + factor * (cosa * normal + direction);
 				}
 				
-				return RandomDirection(rrefract / qrefract, R);
+				return RandomDirection(rd, R);
 			}
 		}
 
 	private:
-		const Luminance rreflect;
-		const Luminance rrefract;
+		const Luminance rd;
 		const GO_FLOAT refract;
 	};
 }

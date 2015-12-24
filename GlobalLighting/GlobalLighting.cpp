@@ -118,23 +118,22 @@ void InitScene()
 	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
 	
 	GO_FLOAT rrefract[] = {1, 1, 1};
-	GO_FLOAT rreflect[] = {0, 0, 0};
-	GO_FLOAT refract = 1 / 2;
-	const IMaterial* m_refractor = new Materials::IdealRefractorMaterial(rreflect, rrefract, refract);
+	GO_FLOAT refract = 1 / 2.0;
+	const IMaterial* m_refractor = new Materials::IdealRefractorMaterial(rrefract, refract);
 	
 	const ITexturedMaterial* m_chess2 = new Materials::CheckeredMaterial(10, 1, m_red, m_green);
 
-	GO_FLOAT Le1[] = {20, 20, 20};
+	GO_FLOAT Le1[] = {25, 25, 25};
 	
 	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector( 0.5, -0.5, 1), m_chess);
-	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m_blue);
-	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m_chess2);
-	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m_red);
-	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m_yellow);
+	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector( 0.5,  0.5, 1), Vector(-0.5,  0.5, 2), m_yellow);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 2), Vector(-0.5,  0.5, 2), Vector( 0.5, -0.5, 2), m_refractor);
+	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5,  0.5, 2), Vector(-0.5, -0.5, 1), m_green);
+	const IShape* rightWall = new Shapes::Square(Vector( 0.5,  0.5, 1), Vector( 0.5, -0.5, 1), Vector( 0.5,  0.5, 2), m_refractor);
 
 	const IShape* ball1 = new Shapes::Sphere(Vector(   0, -0.4, 1.3), 0.1,  m1);
-	const IShape* ball2 = new Shapes::Sphere(Vector(0.15, 0.2, 1.5), 0.1, m2);
-	const IShape* ball3 = new Shapes::Sphere(Vector(0, -0.5 + 0.2, 1.5), 0.15, m_refractor);
+	const IShape* ball2 = new Shapes::Sphere(Vector(-0.23, 0, 1.3), 0.1, m2);
+	const IShape* ball3 = new Shapes::Sphere(Vector(0.3, -0.3, 1.5), 0.15, m_refractor);
 
 	const IShape* shapes[] = {
 		floor,
