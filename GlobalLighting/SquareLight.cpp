@@ -18,6 +18,5 @@ const LightPoint Lights::Square::SampleLightPoint(const Vector& point) const
 	GO_FLOAT t1 = (GO_FLOAT) rand() / RAND_MAX;
 	GO_FLOAT t2 = (GO_FLOAT) rand() / RAND_MAX;
 
-	Vector p = a + t1 * ba + t2 * ca;
-	return LightPoint(p, (point - p).Normalize(), probability, Le);
+	return LightPoint(a + t1 * ba + t2 * ca, normal, probability, Le);
 }
