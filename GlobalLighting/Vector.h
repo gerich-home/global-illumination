@@ -106,6 +106,22 @@ namespace Engine
 			z = vector.z;
 			return *this;
 		}
+		
+		const GO_FLOAT& operator[](short index) const
+		{
+			switch(index)
+			{
+			case 0:
+				return x;
+			break;
+			case 1:
+				return y;
+			break;
+			case 2:
+				return z;
+			break;
+			}
+		}
 
 		Vector CrossProduct(const Vector& vector) const
 		{
