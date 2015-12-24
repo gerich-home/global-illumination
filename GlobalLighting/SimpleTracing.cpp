@@ -4,7 +4,7 @@
 using namespace Engine;
 
 #define SHADOW_RAYS 10
-#define ABSOPTION 0.01
+#define ABSOPTION 0.3
 
 Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape& scene, const IShape& diffuse, const IShape& glossy, const ILightSource& lights) const
 {
@@ -70,7 +70,16 @@ Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, con
 		//break;
 		//Compute indirect luminancy
 		
-		const RandomDirection rndd = current_hp.material->SampleDirection(current_direction, current_point, current_hp.normal, scene, ABSOPTION);
+		GO_FLOAT ksi = (GO_FLOAT) rand() / (RAND_MAX + 1);
+
+		if(ksi < ABSOPTION)
+		{
+			break;
+		}
+
+		ksi = (ksi - ABSOPTION) / (1 - ABSOPTION);
+
+		const RandomDirection rndd = current_hp.material->SampleDirection(current_direction, current_point, current_hp.normal, scene, ksi);
 			
 		if(!rndd.hp)
 		{
@@ -83,7 +92,7 @@ Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, con
 			break;
 		}
 
-		factor *= rndd.factor;
+		factor *= rndd.factor / (1 - ABSOPTION);
 		
 		current_direction = rndd.direction;
 		current_hp = *rndd.hp;

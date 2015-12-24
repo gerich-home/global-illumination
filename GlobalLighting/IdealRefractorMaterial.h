@@ -3,7 +3,6 @@
 #include "Luminance.h"
 #include "IMaterial.h"
 
-#include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -57,26 +56,21 @@ namespace Materials
 			return Luminance();
 		}
 
-		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT absorption) const
+		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT ksi) const
 		{	
 			GO_FLOAT qreflect = (rreflect.colors[L_R] + rreflect.colors[L_G] + rreflect.colors[L_B]) / 3;
 			GO_FLOAT qrefract = (rrefract.colors[L_R] + rrefract.colors[L_G] + rrefract.colors[L_B]) / 3;
 
-			if(qreflect + qrefract + absorption > 1)
+			if(qreflect + qrefract != 1)
 			{
-				GO_FLOAT k = (1 - absorption) / (qreflect + qrefract);
+				GO_FLOAT k = 1 / (qreflect + qrefract);
 				qreflect *= k;
 				qrefract *= k;
 			}
-
-			GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
-
-			if(ksi < absorption)
-				return RandomDirection();
 			
 			GO_FLOAT cosa = -direction.DotProduct(normal);
 			
-			if(ksi - absorption < qreflect)
+			if(ksi < qreflect)
 			{
 				const Vector R = direction + 2 * cosa * normal;
 
@@ -86,7 +80,6 @@ namespace Materials
 			}
 			else
 			{
-
 				GO_FLOAT cosb = 1 - (1 - cosa * cosa) * refract * refract;
 				if(cosb < 0)
 					return RandomDirection();

@@ -48,11 +48,11 @@ Lights::CompositeLightSource::~CompositeLightSource()
 
 const LightPoint Lights::CompositeLightSource::SampleLightPoint(const Vector& point) const
 {
-	GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
+	GO_FLOAT ksi = (GO_FLOAT) rand() / (RAND_MAX + 1);
 
 	for(int i = 0; i < nlights; i++)
 	{
-		if(ksi <= probabilities[i])
+		if(ksi < probabilities[i])
 		{
 			const LightPoint& lp = lights[i]->SampleLightPoint(point);
 			return LightPoint(lp.point, lp.normal, probabilities[i] * lp.probability, lp.Le);

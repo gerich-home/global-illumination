@@ -3,7 +3,6 @@
 #include "Luminance.h"
 #include "IMaterial.h"
 
-#include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -31,7 +30,7 @@ namespace Materials
 			const Vector R = 2 * normal.DotProduct(ndirection) * normal - ndirection;
 			const GO_FLOAT cosphi = -direction.DotProduct(R);
 			
-			if(cosphi > 0 )
+			if(cosphi > 0)
 			{
 				result += Luminance(
 					rs.colors[L_R] == 0 ? 0 : rs.colors[L_R] * (n[L_R] + 2) * pow(cosphi, n[L_R]),
@@ -43,20 +42,21 @@ namespace Materials
 			return result;
 		}
 
-		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT absorption) const
+		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT ksi) const
 		{	
 			GO_FLOAT qd = (rd.colors[L_R] + rd.colors[L_G] + rd.colors[L_B]) / 3;
 			GO_FLOAT qs = (rs.colors[L_R] + rs.colors[L_G] + rs.colors[L_B]) / 3;
 
-			if(qd + qs + absorption > 1)
+			if(qd + qs != 1)
 			{
-				GO_FLOAT k = (1 - absorption) / (qd + qs);
+				if(qd + qs == 0)
+					return RandomDirection();
+
+				GO_FLOAT k = 1 / (qd + qs);
 				qd *= k;
 				qs *= k;
 			}
 			
-			GO_FLOAT ksi = (GO_FLOAT) rand() / RAND_MAX;
-
 			if(ksi < qd)
 			{
 				GO_FLOAT cosa = (GO_FLOAT) rand() / RAND_MAX;
@@ -74,7 +74,7 @@ namespace Materials
 
 				return RandomDirection(rd / (2 * qd), nhp, ndirection);
 			}
-			else if(ksi - qd < qs)
+			else
 			{
 				GO_FLOAT selectedn = min(n[L_R], min(n[L_G], n[L_B]));
 		
@@ -102,10 +102,6 @@ namespace Materials
 					rs.colors[L_G] == 0 ? 0 : rs.colors[L_G] * (n[L_G] + 2) * pow(cosa, n[L_G] - selectedn),
 					rs.colors[L_B] == 0 ? 0 : rs.colors[L_B] * (n[L_B] + 2) * pow(cosa, n[L_B] - selectedn)
 					) * normal.DotProduct(ndirection) / (qs * (selectedn + 2)), nhp, ndirection);
-			}
-			else
-			{
-				return RandomDirection();
 			}
 		}
 
