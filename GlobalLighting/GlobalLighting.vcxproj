@@ -77,17 +77,23 @@
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CausticPhotonMapBuilder.h" />
     <ClInclude Include="CompositeLightSource.h" />
     <ClInclude Include="defines.h" />
+    <ClInclude Include="GlobalPhotonMapBuilder.h" />
     <ClInclude Include="IEngine.h" />
     <ClInclude Include="GlobalLighting.h" />
     <ClInclude Include="HitPoint.h" />
     <ClInclude Include="ILightSource.h" />
     <ClInclude Include="IMaterial.h" />
+    <ClInclude Include="IPhotonMapBuilder.h" />
     <ClInclude Include="IShape.h" />
     <ClInclude Include="LightPoint.h" />
     <ClInclude Include="Luminance.h" />
     <ClInclude Include="DiffuseSpecularMaterial.h" />
+    <ClInclude Include="Photon.h" />
+    <ClInclude Include="PhotonMap.h" />
+    <ClInclude Include="PhotonMapTracing.h" />
     <ClInclude Include="RandomDirection.h" />
     <ClInclude Include="SphereLight.h" />
     <ClInclude Include="SquareLight.h" />
@@ -109,6 +115,8 @@
   <ItemGroup>
     <ClCompile Include="ComposeLightSource.cpp" />
     <ClCompile Include="GlobalLighting.cpp" />
+    <ClCompile Include="PhotonMap.cpp" />
+    <ClCompile Include="PhotonMapTracing.cpp" />
     <ClCompile Include="SphereLight.cpp" />
     <ClCompile Include="SquareLight.cpp" />
     <ClCompile Include="TriangleLight.cpp" />

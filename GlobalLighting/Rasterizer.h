@@ -12,7 +12,7 @@ namespace Engine
 	class ILightSource;
 	class IShape;
 
-	Luminance ColorAtPixel(GO_FLOAT px, GO_FLOAT py, int width, int height, GO_FLOAT cam_z, GO_FLOAT cam_size, const IShape& scene, const ILightSource& lights, const IEngine& engine)
+	Luminance ColorAtPixel(GO_FLOAT px, GO_FLOAT py, int width, int height, GO_FLOAT cam_z, GO_FLOAT cam_size, const IShape& scene, const IShape& diffuse, const IShape& glossy, const ILightSource& lights, const IEngine& engine)
 	{
 		GO_FLOAT lx = cam_size * ((GO_FLOAT) 2 * px / width - 1);
 		GO_FLOAT ly = cam_size * ((GO_FLOAT) (height - 2 * py) / width);
@@ -27,7 +27,7 @@ namespace Engine
 
 		const Vector point(start + direction * hp->t);
 
-		const Luminance& l = engine.L(*hp, point, direction, scene, lights);
+		const Luminance& l = engine.L(*hp, point, direction, scene, diffuse, glossy, lights);
 	
 		delete hp;
 

@@ -25,7 +25,10 @@
 using namespace Engine;
 
 IShape* scene;
+IShape* diffuse;
+IShape* glossy;
 ILightSource* lights;
+IEngine* engine;
 
 #define W 640
 #define H 640
@@ -173,22 +176,51 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	const IMaterial* m3 = new Materials::DuffuseSpecularMaterial(kd3, ks3, n3);
 	
 	GO_FLOAT Le1[] = {20, 20, 20};
+	
+	const IShape* floor     = new Shapes::Square(Vector(-0.5, -0.5, 1),  Vector(-0.5, -0.5, 10), Vector(0.5,  -0.5, 1),  m1);
+	const IShape* ceiling   = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(0.5,   0.5, 1),  Vector(-0.5,  0.5, 10), m1);
+	const IShape* backWall  = new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10),  Vector(0.5,  -0.5, 10), m1);
+	const IShape* leftWall  = new Shapes::Square(Vector(-0.5,  0.5, 1),  Vector(-0.5, 0.5, 10),  Vector(-0.5, -0.5, 1),  m1);
+	const IShape* rightWall = new Shapes::Square(Vector(0.5,  0.5, 1),   Vector(0.5, -0.5, 1),   Vector(0.5, 0.5, 10),   m1);
+		
+	const IShape* ball1 = new Shapes::Sphere(Vector(0, -0.4, 8),    0.1,  m1);
+	const IShape* ball2 = new Shapes::Sphere(Vector(-0.3, 0, 3),    0.15, m2);
+	const IShape* ball3 = new Shapes::Sphere(Vector(-0.3, -0.2, 4), 0.3,  m3);
 
 	const IShape* shapes[] = {
-		//floor
-		new Shapes::Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 10), Vector(0.5,  -0.5, 1), m1),
-		//ceiling
-		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 10), m1),
-		//back wall
-		new Shapes::Square(Vector(-0.5, -0.5, 10), Vector(-0.5, 0.5, 10), Vector(0.5,  -0.5, 10), m3),
-		//left wall
-		new Shapes::Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 10), Vector(-0.5, -0.5, 1), m1),
-		//right wall
-		new Shapes::Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 10), m1),
-		
-		new Shapes::Sphere(Vector(0, -0.4, 8), 0.1, m1),
-		new Shapes::Sphere(Vector(-0.3, 0, 3), 0.15, m2),
-		new Shapes::Sphere(Vector(-0.3, -0.2, 4), 0.3, m3),
+		floor,
+		ceiling,
+		backWall,
+		leftWall,
+		rightWall,
+
+		ball1,
+		ball2,
+		ball3,
+	};
+	
+	const IShape* glossyShapes[] = {
+		//floor,
+		//ceiling,
+		//backWall,
+		//leftWall,
+		//rightWall,
+
+		//ball1,
+		//ball2,
+		ball3,
+	};
+	
+	const IShape* diffuseShapes[] = {
+		floor,
+		ceiling,
+		backWall,
+		leftWall,
+		rightWall,
+
+		ball1,
+		ball2,
+		//ball3,
 	};
 	
 	const ILightSource* lightSources[] = {
@@ -199,8 +231,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	};
 	
 	scene = new Shapes::Scene(sizeof(shapes) / sizeof(IShape*), shapes);
+	glossy = new Shapes::Scene(sizeof(glossyShapes) / sizeof(IShape*), glossyShapes);
+	diffuse = new Shapes::Scene(sizeof(diffuseShapes) / sizeof(IShape*), diffuseShapes);
 	lights = new Lights::CompositeLightSource(sizeof(lightSources) / sizeof(ILightSource*), lightSources);
 	
+	engine = new Engines::SimpleTracing();
+
 	srand(SEED);
 	
 	ZeroMemory(frame, sizeof(frame));
@@ -324,9 +360,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 DWORD ThreadProc(LPVOID lpdwThreadParam)
 {
-
-	IEngine* engine = new SimpleTracing();
-
 	int j = -1;
 
 	while(!destroyed)
@@ -366,7 +399,7 @@ DWORD ThreadProc(LPVOID lpdwThreadParam)
 
 		for(int i = 0; i < W && !destroyed; i++)
 		{
-			L[i * H + j] += ColorAtPixel(i + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, j + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, W, H, CAM_Z, CAM_SIZE, *scene, *lights, *engine);
+			L[i * H + j] += ColorAtPixel(i + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, j + PIXEL_SIZE * (float)rand() / RAND_MAX - PIXEL_SIZE * 0.5, W, H, CAM_Z, CAM_SIZE, *scene, *diffuse, *glossy, *lights, *engine);
 		}
 	}
 

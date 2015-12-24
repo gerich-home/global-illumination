@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Файлы исходного кода\Engine">
-      <UniqueIdentifier>{ac8d9636-bc0b-4bd8-b507-960bf577a82a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Заголовочные файлы\Engine">
       <UniqueIdentifier>{e20ed197-4993-4e05-82a6-d845518e1e14}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,18 @@
     </Filter>
     <Filter Include="Файлы исходного кода\Materials">
       <UniqueIdentifier>{881f13a4-6dda-4e3a-8bee-c23b8a803b52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Engines">
+      <UniqueIdentifier>{0ef40157-e963-48f2-820c-d4c9c7e2da4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Engines">
+      <UniqueIdentifier>{ac8d9636-bc0b-4bd8-b507-960bf577a82a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\PhotonMapBuilders">
+      <UniqueIdentifier>{a1d4b938-f8dc-4dbd-b9fa-b7209c3a3f89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Engine">
+      <UniqueIdentifier>{73aee6d0-7742-440a-8d39-8bb8d30efdae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -117,9 +126,6 @@
     <ClInclude Include="Rasterizer.h">
       <Filter>Заголовочные файлы\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleTracing.h">
-      <Filter>Заголовочные файлы\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -131,6 +137,27 @@
     </ClInclude>
     <ClInclude Include="DiffuseSpecularMaterial.h">
       <Filter>Заголовочные файлы\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Photon.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMapTracing.h">
+      <Filter>Заголовочные файлы\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTracing.h">
+      <Filter>Заголовочные файлы\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="IPhotonMapBuilder.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMap.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="CausticPhotonMapBuilder.h">
+      <Filter>Заголовочные файлы\PhotonMapBuilders</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalPhotonMapBuilder.h">
+      <Filter>Заголовочные файлы\PhotonMapBuilders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -168,10 +195,16 @@
       <Filter>Файлы исходного кода\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="SimpleTracing.cpp">
-      <Filter>Файлы исходного кода\Engine</Filter>
+      <Filter>Файлы исходного кода\Engines</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotonMapTracing.cpp">
+      <Filter>Файлы исходного кода\Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotonMap.cpp">
+      <Filter>Файлы исходного кода\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
