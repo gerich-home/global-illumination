@@ -52,7 +52,7 @@ const LightPoint Lights::CompositeLightSource::SampleLightPoint(const Vector& po
 
 	for(int i = 0; i < nlights; i++)
 	{
-		if(ksi < probabilities[i])
+		if(ksi <= probabilities[i])
 		{
 			const LightPoint& lp = lights[i]->SampleLightPoint(point);
 			return LightPoint(lp.point, lp.normal, probabilities[i] * lp.probability, lp.Le);
@@ -62,4 +62,59 @@ const LightPoint Lights::CompositeLightSource::SampleLightPoint(const Vector& po
 			ksi -= probabilities[i];
 		}
 	}
+}
+
+void Lights::CompositeLightSource::EmitPhotons(int nphotons, Photon photons[]) const
+{
+	GO_FLOAT* energy = new GO_FLOAT[nlights];
+	
+	Luminance totalLe;
+	for(int i = 0; i < nlights; i++)
+	{
+		const Luminance lei = lights[i]->Le();
+		totalLe += lei;
+		energy[i] = (lei.r() + lei.g() + lei.b()) / 3;
+	}
+
+	GO_FLOAT factor = nphotons * 3 / (totalLe.r() + totalLe.g() + totalLe.b());
+
+	int* nphotonsPerLight = new int[nlights];
+	int remainedPhotons = 0;
+
+	for(int i = 0; i < nlights; i++)
+	{
+		nphotonsPerLight[i] = factor * energy[i];
+		remainedPhotons += nphotonsPerLight[i];
+	}
+	
+	delete[] energy;
+
+	remainedPhotons = nphotons - remainedPhotons;
+	
+	for(int i = 0; i < remainedPhotons; i++)
+	{
+		nphotonsPerLight[i]++;
+	}
+
+	int offset = 0;
+
+	for(int i = 0; i < nlights; i++)
+	{
+		lights[i]->EmitPhotons(nphotonsPerLight[i], photons + offset);
+		offset += nphotonsPerLight[i];
+	}
+
+	delete[] nphotonsPerLight;
+}
+
+Luminance Lights::CompositeLightSource::Le() const
+{
+	Luminance Le;
+
+	for(int i = 0; i < nlights; i++)
+	{
+		Le += lights[i]->Le();
+	}
+	
+	return Le;
 }

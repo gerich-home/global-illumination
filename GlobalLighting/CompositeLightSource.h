@@ -14,6 +14,8 @@ namespace Lights
 		~CompositeLightSource();
 
 		virtual const LightPoint SampleLightPoint(const Vector& point) const;
+		virtual void EmitPhotons(int nphotons, Photon photons[]) const;
+		virtual Luminance Le() const;
 
 	private:
 		const ILightSource** lights;

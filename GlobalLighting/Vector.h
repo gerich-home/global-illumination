@@ -133,6 +133,37 @@ namespace Engine
 			return vector.x * x + vector.y * y + vector.z * z;
 		}
 
+		Vector Transform(const Vector& axis) const
+		{
+			Vector t = axis;
+			Vector M1;
+			Vector M2;
+
+			if(abs(axis.x) < abs(axis.y))
+			{
+				if(abs(axis.x) < abs(axis.z))
+					t.x = 1;
+				else
+					t.z = 1;
+			}
+			else
+			{
+				if(abs(axis.y) < abs(axis.z))
+					t.y = 1;
+				else
+					t.z = 1;
+			}
+	
+			M1 = axis.CrossProduct(t).Normalize();
+			M2 = axis.CrossProduct(M1);
+	
+
+			return Vector(
+				x * M1.x + y * M2.x + z * axis.x,
+				x * M1.y + y * M2.y + z * axis.y,
+				x * M1.z + y * M2.z + z * axis.z);
+		}
+
 		GO_FLOAT x;
 		GO_FLOAT y;
 		GO_FLOAT z;
