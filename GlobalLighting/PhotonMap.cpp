@@ -33,6 +33,30 @@ public:
 };
 
 
+class Engine::ParamsForFind
+{
+public:
+	ParamsForFind(const Vector& x, int count, Photon** result):
+		x(x),
+		count(count),
+		result(result)
+	{
+		distances = new GO_FLOAT[count];
+	}
+
+	~ParamsForFind()
+	{
+		delete[] distances;
+	}
+
+	const Vector x;
+	int count; 
+	int currentCount; 
+	Photon** result; 
+	GO_FLOAT* distances;
+	GO_FLOAT r2;
+};
+
 void PhotonMap::QSort(int left, int right, short axis)
 {
     int l = left;
@@ -161,37 +185,74 @@ PhotonMap::~PhotonMap()
 		delete root;
 }
 
-void PhotonMap::GoDown(GO_FLOAT min[3], GO_FLOAT max[3], PhotonMapNode* node, const ParamsForFind& paramsForFind) const
+void PhotonMap::GoDown(PhotonMapNode* node, ParamsForFind& paramsForFind) const
 {
 	short axis = node->axis;
 	
-	if(paramsForFind.x[axis] <= node->photon.point[axis])
+	GO_FLOAT delta = paramsForFind.x[axis] - node->photon.point[axis];
+
+	if(delta <= 0)
 	{
-		max[axis] = node->photon.point[axis];
 		if(node->left)
 		{
-			GoDown(min, max, node->left, paramsForFind);
-		}
-		else
-		{
+			GoDown(node->left, paramsForFind);
+
+			if(delta * delta < paramsForFind.r2)
+			{
+				if(node->right)
+				{
+					GoDown(node->right, paramsForFind);
+				}
+			}
 		}
 	}
 	else
 	{
-		min[axis] = node->photon.point[axis];
-		
-		if(node->left)
+		if(node->right)
 		{
-			GoDown(min, max, node->right, paramsForFind);
+			GoDown(node->right, paramsForFind);
+
+			if(delta * delta < paramsForFind.r2)
+			{
+				if(node->left)
+				{
+					GoDown(node->left, paramsForFind);
+				}
+			}
 		}
-		else
+	}
+
+	delta = (node->photon.point - paramsForFind.x).Norm();
+
+	if(paramsForFind.currentCount < paramsForFind.count)
+	{
+		paramsForFind.result[paramsForFind.currentCount] = &node->photon;
+		paramsForFind.distances[paramsForFind.currentCount] = delta;
+		paramsForFind.currentCount++;
+		if(delta > paramsForFind.r2)
 		{
+			paramsForFind.r2 = delta;
+		}
+	}
+	else if(delta < paramsForFind.r2)
+	{
+		for(int i = 0; i < paramsForFind.count; i++)
+		{
+			if(paramsForFind.distances[i] == paramsForFind.r2)
+			{
+				paramsForFind.result[i] = &node->photon;
+				paramsForFind.distances[i] = delta;
+				paramsForFind.r2 = delta;
+				break;
+			}
 		}
 	}
 }
 
-void PhotonMap::FindNearest(const Vector& x, int count, Photon** result) const
+GO_FLOAT PhotonMap::FindNearest(const Vector& x, int count, Photon** result) const
 {
-	
+	ParamsForFind p(x, count, result);
+	GoDown(root, p);
+	return p.r2;
 }
 
