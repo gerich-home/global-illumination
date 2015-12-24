@@ -23,15 +23,11 @@ namespace Materials
 			return Luminance();
 		}
 
-		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT ksi) const
+		const RandomDirection SampleDirection(const Vector& direction, const Vector& normal, GO_FLOAT ksi) const
 		{
 			const Vector R = direction - 2 * normal.DotProduct(direction) * normal;
-			const HitPoint* nhp = scene.Intersection(point, R);
-			
-			if(nhp)
-				return RandomDirection(rs, nhp, R);
 
-			return RandomDirection();
+			return RandomDirection(rs, R);
 		}
 
 	private:

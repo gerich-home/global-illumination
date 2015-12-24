@@ -79,26 +79,27 @@ Luminance Engines::SimpleTracing::L(const HitPoint& hp, const Vector& point, con
 
 		ksi = (ksi - ABSOPTION) / (1 - ABSOPTION);
 
-		const RandomDirection rndd = current_hp.material->SampleDirection(current_direction, current_point, current_hp.normal, scene, ksi);
-			
-		if(!rndd.hp)
+		const RandomDirection rndd = current_hp.material->SampleDirection(current_direction, current_hp.normal, ksi);
+		
+		if(rndd.factor.colors[L_R] == 0 && rndd.factor.colors[L_G] == 0 && rndd.factor.colors[L_B] == 0)
 		{
 			break;
 		}
 
-		if(rndd.factor.colors[L_R] == 0 && rndd.factor.colors[L_G] == 0 && rndd.factor.colors[L_B] == 0)
+		const HitPoint* nhp = scene.Intersection(current_point, rndd.direction);
+		
+		if(!nhp)
 		{
-			delete rndd.hp;
 			break;
 		}
 
 		factor *= rndd.factor / (1 - ABSOPTION);
 		
 		current_direction = rndd.direction;
-		current_hp = *rndd.hp;
+		current_hp = *nhp;
 		current_point += current_direction * current_hp.t;
 
-		delete rndd.hp;
+		delete nhp;
 	}
 
 	return result;

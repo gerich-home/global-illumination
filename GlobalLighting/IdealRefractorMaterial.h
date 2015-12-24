@@ -56,7 +56,7 @@ namespace Materials
 			return Luminance();
 		}
 
-		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT ksi) const
+		const RandomDirection SampleDirection(const Vector& direction, const Vector& normal, GO_FLOAT ksi) const
 		{	
 			GO_FLOAT qreflect = (rreflect.colors[L_R] + rreflect.colors[L_G] + rreflect.colors[L_B]) / 3;
 			GO_FLOAT qrefract = (rrefract.colors[L_R] + rrefract.colors[L_G] + rrefract.colors[L_B]) / 3;
@@ -73,10 +73,7 @@ namespace Materials
 			if(ksi < qreflect)
 			{
 				const Vector R = direction + 2 * cosa * normal;
-
-				const HitPoint* nhp = scene.Intersection(point, R);			
-				if(nhp)
-					return RandomDirection(rreflect / qreflect, nhp, R);	
+				return RandomDirection(rreflect / qreflect, R);	
 			}
 			else
 			{
@@ -96,12 +93,8 @@ namespace Materials
 					R = cosb * normal + refract * (cosa * normal + direction);
 				}
 				
-				const HitPoint* nhp = scene.Intersection(point, R);			
-				if(nhp)
-					return RandomDirection(rrefract / qrefract, nhp, R);
+				return RandomDirection(rrefract / qrefract, R);
 			}
-
-			return RandomDirection();
 		}
 
 	private:

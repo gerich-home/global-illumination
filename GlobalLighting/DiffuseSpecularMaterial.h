@@ -42,7 +42,7 @@ namespace Materials
 			return result;
 		}
 
-		const RandomDirection SampleDirection(const Vector& direction, const Vector& point, const Vector& normal, const IShape& scene, GO_FLOAT ksi) const
+		const RandomDirection SampleDirection(const Vector& direction, const Vector& normal, GO_FLOAT ksi) const
 		{	
 			GO_FLOAT qd = (rd.colors[L_R] + rd.colors[L_G] + rd.colors[L_B]) / 3;
 			GO_FLOAT qs = (rs.colors[L_R] + rs.colors[L_G] + rs.colors[L_B]) / 3;
@@ -65,14 +65,7 @@ namespace Materials
 
 				Vector ndirection = Vector(sina * cos(b), sina * sin(b), cosa).Transform(normal);
 
-				const HitPoint* nhp = scene.Intersection(point, ndirection);
-
-				if(!nhp)
-				{
-					return RandomDirection();
-				}
-
-				return RandomDirection(rd / (2 * qd), nhp, ndirection);
+				return RandomDirection(rd / (2 * qd), ndirection);
 			}
 			else
 			{
@@ -90,24 +83,17 @@ namespace Materials
 					return RandomDirection();
 				}
 
-				const HitPoint* nhp = scene.Intersection(point, ndirection);
-
-				if(!nhp)
-				{
-					return RandomDirection();
-				}
-
 				return RandomDirection(Luminance(
 					rs.colors[L_R] == 0 ? 0 : rs.colors[L_R] * (n[L_R] + 2) * pow(cosa, n[L_R] - selectedn),
 					rs.colors[L_G] == 0 ? 0 : rs.colors[L_G] * (n[L_G] + 2) * pow(cosa, n[L_G] - selectedn),
 					rs.colors[L_B] == 0 ? 0 : rs.colors[L_B] * (n[L_B] + 2) * pow(cosa, n[L_B] - selectedn)
-					) * normal.DotProduct(ndirection) / (qs * (selectedn + 2)), nhp, ndirection);
+					) * normal.DotProduct(ndirection) / (qs * (selectedn + 2)), ndirection);
 			}
 		}
 
 	private:
-		const Luminance rd; //koefficient diffuse reflection
-		const Luminance rs; //koefficient specular reflection
+		const Luminance rd;
+		const Luminance rs;
 		int n[3];
 	};
 }

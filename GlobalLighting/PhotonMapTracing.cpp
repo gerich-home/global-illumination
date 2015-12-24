@@ -5,7 +5,7 @@ using namespace Engine;
 
 #define SHADOW_RAYS 10
 #define ABSOPTION 0.01
-
+/*
 Luminance Engines::PhotonMapTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape& scene, const IShape& diffuse, const IShape& glossy, const ILightSource& lights) const
 {
 	Luminance result;
@@ -93,4 +93,4 @@ Luminance Engines::PhotonMapTracing::L(const HitPoint& hp, const Vector& point, 
 	}
 
 	return result;
-}
+}*/

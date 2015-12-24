@@ -71,13 +71,13 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 void InitScene()
 {
 	GO_FLOAT kd_black[] = {0, 0, 0};
-	GO_FLOAT ks_black[] = {0, 0, 0};
-	int      n_black[]  = {0, 0, 0};
+	GO_FLOAT ks_black[] = {0, 0, 0.2};
+	int      n_black[]  = {1, 1, 1};
 	const IMaterial* m_black = new Materials::DuffuseSpecularMaterial(kd_black, ks_black, n_black);
 
-	GO_FLOAT kd_white[] = {1, 1, 1};
-	GO_FLOAT ks_white[] = {0, 0, 0};
-	int      n_white[]  = {0, 0, 0};
+	GO_FLOAT kd_white[] = {1, 1, 0.8};
+	GO_FLOAT ks_white[] = {0, 0, 0.2};
+	int      n_white[]  = {1, 1, 1};
 	const IMaterial* m_white = new Materials::DuffuseSpecularMaterial(kd_white, ks_white, n_white);
 
 	const ITexturedMaterial* m_chess = new Materials::CheckeredMaterial(10, 10, m_white, m_black);
@@ -143,9 +143,9 @@ void InitScene()
 		leftWall,
 		rightWall,
 
-		ball1,
-		//ball2,
-		//ball3,
+		//ball1,
+		ball2,
+		ball3,
 	};
 	
 	const IShape* glossyShapes[] = {
