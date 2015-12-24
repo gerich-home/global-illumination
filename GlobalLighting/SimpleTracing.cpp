@@ -5,22 +5,22 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
+using namespace Engine;
 #define N 10
 #define SHADOW_RAYS 10
 #define MAX_DEEP 4
 
-Engine::SimpleTracing::SimpleTracing(void)
+SimpleTracing::SimpleTracing(void)
 {
 	srand(time(0));
 	currentDeep = 0;
 }
 
-Engine::SimpleTracing::~SimpleTracing(void)
+SimpleTracing::~SimpleTracing(void)
 {
 }
 
-GO_FLOAT Engine::SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights, int colorIndex)
+GO_FLOAT SimpleTracing::L(const HitPoint& hp, const Vector& point, const Vector& direction, const IShape* scene, const ILightSource* lights, int colorIndex)
 {
 	GO_FLOAT direct = 0;
 	GO_FLOAT indirect = 0;
@@ -51,35 +51,8 @@ GO_FLOAT Engine::SimpleTracing::L(const HitPoint& hp, const Vector& point, const
 				ax = sina * cos(b);
 				ay = sina * sin(b);
 				az = cosa;
-
-				if(az == 0)
-				{
-					continue;
-				}
-	
-				Vector M1;
-				Vector M2;
-		
-				if(hp.normal.z == 1)
-				{
-					M1 = Vector(1, 0, 0);
-					M2 = Vector(0, 1, 0);
-				}
-				else if(hp.normal.z == -1)
-				{
-					M1 = Vector(-1, 0, 0);
-					M2 = Vector(0, -1, 0);
-				}
-				else
-				{
-					M1 = hp.normal.CrossProduct(Vector(0, 0, 1)).Normalize();
-					M2 = hp.normal.CrossProduct(M1);
-				}
-					
-				ndirection = Vector(
-					ax * M1.x + ay * M2.x + az * hp.normal.x,
-					ax * M1.y + ay * M2.y + az * hp.normal.y,
-					ax * M1.z + ay * M2.z + az * hp.normal.z);
+								
+				ndirection = Transform(hp.normal, Vector(ax, ay, az));
 
 				const HitPoint* nhp = scene->Intersection(point, ndirection);
 
@@ -104,34 +77,7 @@ GO_FLOAT Engine::SimpleTracing::L(const HitPoint& hp, const Vector& point, const
 				ay = sina * sin(b);
 				az = cosa;
 
-				if(az == 0)
-				{
-					continue;
-				}
-	
-				Vector M1;
-				Vector M2;
-		
-				if(hp.normal.z == 1)
-				{
-					M1 = Vector(1, 0, 0);
-					M2 = Vector(0, 1, 0);
-				}
-				else if(hp.normal.z == -1)
-				{
-					M1 = Vector(-1, 0, 0);
-					M2 = Vector(0, -1, 0);
-				}
-				else
-				{
-					M1 = hp.normal.CrossProduct(Vector(0, 0, 1)).Normalize();
-					M2 = hp.normal.CrossProduct(M1);
-				}
-					
-				ndirection = Vector(
-					ax * M1.x + ay * M2.x + az * hp.normal.x,
-					ax * M1.y + ay * M2.y + az * hp.normal.y,
-					ax * M1.z + ay * M2.z + az * hp.normal.z);
+				ndirection = Transform(hp.normal, Vector(ax, ay, az));
 
 				const HitPoint* nhp = scene->Intersection(point, ndirection);
 
@@ -201,4 +147,35 @@ GO_FLOAT Engine::SimpleTracing::L(const HitPoint& hp, const Vector& point, const
 
 	currentDeep--;
 	return direct + indirect;
+}
+
+Vector SimpleTracing::Transform(const Vector& axis, const Vector& direction) const
+{
+	Vector t = axis;
+	Vector M1;
+	Vector M2;
+
+	if(abs(axis.x) < abs(axis.y))
+	{
+		if(abs(axis.x) < abs(axis.z))
+			t.x = 1;
+		else
+			t.z = 1;
+	}
+	else
+	{
+		if(abs(axis.y) < abs(axis.z))
+			t.y = 1;
+		else
+			t.z = 1;
+	}
+	
+	M1 = axis.CrossProduct(t).Normalize();
+	M2 = axis.CrossProduct(M1);
+	
+
+	return Vector(
+		direction.x * M1.x + direction.y * M2.x + direction.z * axis.x,
+		direction.x * M1.y + direction.y * M2.y + direction.z * axis.y,
+		direction.x * M1.z + direction.y * M2.z + direction.z * axis.z);
 }
