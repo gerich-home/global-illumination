@@ -1,7 +1,5 @@
 #pragma once
 #include "IShape.h"
-#include "Vector.h"
-#include "HitPoint.h"
 
 class Scene : public IShape
 {

@@ -102,6 +102,15 @@
     <ClInclude Include="Square.h">
       <Filter>Заголовочные файлы\GeometryObjects</Filter>
     </ClInclude>
+    <ClInclude Include="ILightSource.h">
+      <Filter>Заголовочные файлы\GeometryObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPoint.h">
+      <Filter>Заголовочные файлы\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="CompositeLightSource.h">
+      <Filter>Заголовочные файлы\GeometryObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -130,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="MemoryManager.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="ComposeLightSource.cpp">
+      <Filter>Файлы исходного кода\GeometryObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

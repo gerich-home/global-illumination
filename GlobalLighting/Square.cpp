@@ -2,17 +2,15 @@
 #include "Square.h"
 
 
-Square::Square(const Vector a, const Vector b, const Vector c, const Material* material):
+Square::Square(const Vector a, const Vector b, const Vector c, const Material* material, const Luminance& Le):
 	a(a),
 	ba(b - a),
 	ca(c - a),
-	material(material)
-{
-	normal = ba.CrossProduct(ca);
-	n = normal.Normalize();
-}
-
-Square::~Square(void)
+	normal((b - a).CrossProduct(c - a)),
+	n((b - a).CrossProduct(c - a).Normalize()),
+	probability((b - a).CrossProduct(c - a).Length()),
+	material(material),
+	Le(Le)
 {
 }
 
@@ -56,4 +54,12 @@ const HitPoint* Square::Intersection(const Vector& start, const Vector& directio
 	}
 
 	return new HitPoint(t, n, material);
+}
+
+const LightPoint Square::SampleLightPoint(const HitPoint& hitPoint, int colorIndex) const
+{
+	GO_FLOAT t1 = (GO_FLOAT) rand() / RAND_MAX;
+	GO_FLOAT t2 = (GO_FLOAT) rand() / RAND_MAX;
+
+	return LightPoint(a + t1 * ba + t2 * ca, probability, Le.colors[colorIndex]);
 }

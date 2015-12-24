@@ -156,27 +156,27 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	int      n3[]  = {0, 0, 0};
 
 	const IShape* shapes[] = {
-		//new Triangle(Vector(0, 0, 2), Vector(0, 1, 1), Vector(1, 0, 1), new Material(kd3, ks3, Le3, n3)),
+		//new Triangle(Vector(0, 0, 2), Vector(0, 1, 1), Vector(1, 0, 1), new Material(kd3, ks3, n3), Le3),
 		//floor
-		new Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(-0.5, -0.5, 1), Vector(-0.5, -0.5, 2), Vector(0.5,  -0.5, 1), new Material(kd3, ks3, n3), Le3),
 		//ceiling
-		//new Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		//new Square(Vector(-0.5,  0.5, 1), Vector(0.5,   0.5, 1), Vector(-0.5,  0.5, 2), new Material(kd3, ks3, n3), Le3),
 		//back wall
-		new Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(-0.5, -0.5, 2), Vector(-0.5, 0.5, 2), Vector(0.5,  -0.5, 2), new Material(kd3, ks3, n3), Le3),
 		//left wall
-		new Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(-0.5,  0.5, 1), Vector(-0.5, 0.5, 2), Vector(-0.5, -0.5, 1), new Material(kd3, ks3, n3), Le3),
 		//right wall
-		new Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), new Material(kd3, ks3, Le3, n3)),
+		new Square(Vector(0.5,  0.5, 1), Vector(0.5, -0.5, 1), Vector(0.5, 0.5, 2), new Material(kd3, ks3, n3), Le3),
 		
-		new Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), new Material(kd2, ks2, Le2, n2)),
+		new Square(Vector(-0.15, 0.5, 1.35), Vector(0.15,  0.5, 1.35), Vector(-0.15, 0.5, 1.65), new Material(kd2, ks2, n2), Le2),
 		
-		new Sphere(Vector(0, -0.4, 1.5), 0.1, new Material(kd1, ks1, Le1, n1)),
+		new Sphere(Vector(0, -0.4, 1.5), 0.1, new Material(kd1, ks1, n1), Le1),
 		
-		//new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, Le1, n1)),
-		//new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, Le1, n1)),
-		//new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, Le3, n3)),*/
-		//new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, Le2, n2)),
-		//new Sphere(Vector(-6, 0, -12), 1, new Material(kd2, ks2, Le2, n2))
+		//new Sphere(Vector(2, 0, 5), 1, new Material(kd1, ks1, n1), Le1),
+		//new Sphere(Vector(-2, 0, 7), 1, new Material(kd1, ks1, n1), Le1),
+		//new Sphere(Vector(0, 0, -5), 1, new Material(kd3, ks3, n3), Le3),*/
+		//new Sphere(Vector(3, 5, -10), 1, new Material(kd2, ks2, n2), Le2),
+		//new Sphere(Vector(-6, 0, -12), 1, new Material(kd2, ks2, n2), Le2)
 	};
 
 	scene = new Scene(sizeof(shapes) / sizeof(IShape*), shapes);
@@ -240,9 +240,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for(int i = 0; i < W; i++)
 				{
 					Luminance l = L[i * H + j] / frame[j];
-					SetPixel(hdc, i, j, RGB(l.r > 1 ? 255 : l.r * 255,
-											l.g > 1 ? 255 : l.g * 255,
-											l.b > 1 ? 255 : l.b * 255
+					SetPixel(hdc, i, j, RGB(l.r() > 1 ? 255 : l.r() * 255,
+											l.g() > 1 ? 255 : l.g() * 255,
+											l.b() > 1 ? 255 : l.b() * 255
 											));
 				}
 				SetPixel(hdc, 100, j, RGB(frame[j],

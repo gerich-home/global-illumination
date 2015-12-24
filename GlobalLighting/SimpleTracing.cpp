@@ -6,8 +6,8 @@
 #include <math.h>
 
 
-#define N 30
-#define MAX_DEEP 3
+#define N 40
+#define MAX_DEEP 4
 
 SimpleTracing::SimpleTracing(void)
 {
@@ -147,7 +147,7 @@ GO_FLOAT SimpleTracing::L(const HitPoint* hp, const Vector& point, const Vector&
 		result /= N;
 	}
 
-	result += hp->material->Le[colorIndex] * (-direction.DotProduct(hp->normal));
+	//result += hp->material->Le[colorIndex] * (-direction.DotProduct(hp->normal));
 
 	currentDeep--;
 	return result;

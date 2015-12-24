@@ -12,10 +12,9 @@ Scene::Scene(int nshapes, const IShape* shapes[]) :
 	}
 }
 
-
-Scene::~Scene(void)
+Scene::~Scene()
 {
-	
+	delete[] shapes;
 }
 
 const HitPoint* Scene::Intersection(const Vector& start, const Vector& direction) const
