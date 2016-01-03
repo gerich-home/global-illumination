@@ -4,3 +4,7 @@
 Global illumination implementation
 
 MSPL license
+
+# Authors
+Valya Smoryakova
+Sergey Gerasimov
